@@ -9,15 +9,15 @@ import java.util.List;
 
 @Getter
 @Setter
-public final class ExchangeRateManager {
-    private static ExchangeRateManager instance = null;
+public final class ExchangeManager {
+    private static ExchangeManager instance = null;
     private ArrayList<String> currencies;
     private ArrayList<ExchangeRate> exchangeRates;
     private double[][] graph;
 
     private static final double ERROR = 10e8;
 
-    private ExchangeRateManager() {
+    private ExchangeManager() {
         currencies = new ArrayList<String>();
         exchangeRates = new ArrayList<ExchangeRate>();
     }
@@ -27,9 +27,9 @@ public final class ExchangeRateManager {
      * It the instance is null, create it and then return it.
      * @return the instance of the exchange rate manager
      */
-    public static ExchangeRateManager getInstance() {
+    public static ExchangeManager getInstance() {
         if (instance == null) {
-            instance = new ExchangeRateManager();
+            instance = new ExchangeManager();
         }
 
         return instance;
@@ -138,5 +138,9 @@ public final class ExchangeRateManager {
      */
     public double getConversionRate(final String from, final String to) {
         return graph[currencies.indexOf(from)][currencies.indexOf(to)];
+    }
+
+    public double getAmount(final String from, final String to, final double amount) {
+        return amount * getConversionRate(from, to);
     }
 }

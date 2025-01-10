@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.poo.managers.BankManager;
-import org.poo.managers.ExchangeRateManager;
+import org.poo.managers.ExchangeManager;
 import org.poo.checker.Checker;
 import org.poo.checker.CheckerConstants;
 import org.poo.commands.CommandInvoker;
@@ -98,10 +98,11 @@ public final class Main {
          */
 
         BankManager bankManager = BankManager.getInstance();
-        ExchangeRateManager exchangeRateManager = ExchangeRateManager.getInstance();
+        ExchangeManager exchangeManager = ExchangeManager.getInstance();
 
         bankManager.addUsers(Arrays.asList(inputData.getUsers()));
-        exchangeRateManager.generateExchangeRates(Arrays.asList(inputData.getExchangeRates()));
+        bankManager.addCommerciants(Arrays.asList(inputData.getCommerciants()));
+        exchangeManager.generateExchangeRates(Arrays.asList(inputData.getExchangeRates()));
 
         CommandInvoker commandInvoker = new CommandInvoker(output);
         commandInvoker.processCommands(inputData);
@@ -110,7 +111,7 @@ public final class Main {
         objectWriter.writeValue(new File(filePath2), output);
 
         bankManager.resetBankData();
-        exchangeRateManager.resetData();
+        exchangeManager.resetData();
         Utils.resetRandom();
     }
 

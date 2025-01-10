@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
-import org.poo.managers.ExchangeRateManager;
+import org.poo.managers.ExchangeManager;
 import org.poo.transaction.Transaction;
 import org.poo.user.User;
 
@@ -56,7 +56,7 @@ public final class SendMoneyCommand extends Command {
      */
     private Transaction getTransaction(final String from, final String to,
                                        final String transactionType) {
-        ExchangeRateManager exchangeManager = ExchangeRateManager.getInstance();
+        ExchangeManager exchangeManager = ExchangeManager.getInstance();
         double conversionRate = exchangeManager.getConversionRate(from, to);
         double convertedAmount = conversionRate * getInput().getAmount();
 

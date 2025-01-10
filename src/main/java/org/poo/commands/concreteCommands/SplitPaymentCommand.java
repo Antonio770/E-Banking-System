@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
-import org.poo.managers.ExchangeRateManager;
+import org.poo.managers.ExchangeManager;
 import org.poo.transaction.Transaction;
 import org.poo.user.User;
 
@@ -20,7 +20,7 @@ public final class SplitPaymentCommand extends Command {
         double amountPerPerson = getInput().getAmount() / getInput().getAccounts().size();
         ArrayList<Account> accounts = new ArrayList<Account>();
 
-        ExchangeRateManager exchangeManager = ExchangeRateManager.getInstance();
+        ExchangeManager exchangeManager = ExchangeManager.getInstance();
         boolean canPay = true;
         Account failedAccount = null;
 

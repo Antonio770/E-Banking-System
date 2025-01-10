@@ -46,6 +46,8 @@ public final class CommandFactory {
         COMMANDS.put("spendingsReport", SpendingsReportCommand::new);
         COMMANDS.put("addInterest", AddInterestCommand::new);
         COMMANDS.put("changeInterestRate", ChangeInterestRateCommand::new);
+        COMMANDS.put("withdrawSavings", WithdrawSavingsCommand::new);
+        COMMANDS.put("upgradePlan", UpgradePlanCommand::new);
     }
 
     /**

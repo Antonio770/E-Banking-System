@@ -18,6 +18,7 @@ public final class Transaction {
     private String cardHolder;
 
     private String account;
+    private String accountIban;
     private String email;
 
     private Double amount;
@@ -32,6 +33,8 @@ public final class Transaction {
     private List<String> involvedAccounts;
     private String error;
 
+    private String newPlanType;
+
     public static final class Builder {
         // Mandatory fields
         private int timestamp;
@@ -42,6 +45,7 @@ public final class Transaction {
         private String cardHolder = null;
 
         private String account = null;
+        private String accountIban = null;
         private String email = null;
 
         private Double amount = null;
@@ -55,6 +59,8 @@ public final class Transaction {
         private String currency = null;
         private List<String> involvedAccounts = null;
         private String error = null;
+
+        private String newPlanType = null;
 
         /**
          * Sets the timestamp of the transaction
@@ -103,6 +109,16 @@ public final class Transaction {
          */
         public Builder account(final String acc) {
             this.account = acc;
+            return this;
+        }
+
+        /**
+         * Sets the account used to do the transaction
+         * @param acc the account to be set
+         * @return the Builder instance
+         */
+        public Builder accountIban(final String acc) {
+            this.accountIban = acc;
             return this;
         }
 
@@ -208,6 +224,16 @@ public final class Transaction {
         }
 
         /**
+         * Sets the new plan type of the upgrade transaction
+         * @param type the type of the new plan
+         * @return the Builder instance
+         */
+        public Builder newPlanType(final String type) {
+            this.newPlanType = type;
+            return this;
+        }
+
+        /**
          * Builds the transaction
          * @return the transaction built
          */
@@ -222,6 +248,7 @@ public final class Transaction {
         this.card = builder.card;
         this.cardHolder = builder.cardHolder;
         this.account = builder.account;
+        this.accountIban = builder.accountIban;
         this.email = builder.email;
         this.amount = builder.amount;
         this.stringAmount = builder.stringAmount;
@@ -232,6 +259,7 @@ public final class Transaction {
         this.currency = builder.currency;
         this.involvedAccounts = builder.involvedAccounts;
         this.error = builder.error;
+        this.newPlanType = builder.newPlanType;
     }
 
     /**
@@ -256,6 +284,10 @@ public final class Transaction {
 
         if (account != null) {
             output.put("account", this.account);
+        }
+
+        if (accountIban != null) {
+            output.put("accountIBAN", this.accountIban);
         }
 
         if (email != null) {
@@ -302,6 +334,10 @@ public final class Transaction {
 
         if (error != null) {
             output.put("error", this.error);
+        }
+
+        if (newPlanType != null) {
+            output.put("newPlanType", this.newPlanType);
         }
 
         return output;

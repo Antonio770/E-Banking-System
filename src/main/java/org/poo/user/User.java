@@ -11,20 +11,30 @@ import org.poo.fileio.CommandInput;
 import org.poo.fileio.UserInput;
 import org.poo.paymentStrategies.PaymentFactory;
 import org.poo.paymentStrategies.PaymentStrategy;
+import org.poo.planStrategies.Plan;
+import org.poo.planStrategies.StandardPlan;
+import org.poo.planStrategies.StudentPlan;
 import org.poo.transaction.Transaction;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 @Getter
 @Setter
-@JsonIgnoreProperties({"transactions", "paymentStrategy", "aliasMap"})
+@JsonIgnoreProperties({"transactions", "paymentStrategy", "aliasMap", "plan",
+                        "birthDate", "occupation", "age"})
 public final class User {
     private String firstName;
     private String lastName;
     private String email;
+    private String birthDate;
+    private String occupation;
+
     private ArrayList<Account> accounts;
+    private Plan plan;
 
     private ArrayList<Transaction> transactions;
     private PaymentStrategy paymentStrategy;
@@ -34,9 +44,17 @@ public final class User {
         this.firstName = input.getFirstName();
         this.lastName = input.getLastName();
         this.email = input.getEmail();
+        this.birthDate = input.getBirthDate();
+        this.occupation = input.getOccupation();
         this.accounts = new ArrayList<Account>();
         this.transactions = new ArrayList<Transaction>();
         this.aliasMap = new HashMap<String, String>();
+
+        if (this.occupation.equals("student")) {
+            this.plan = new StudentPlan();
+        } else {
+            this.plan = new StandardPlan();
+        }
     }
 
     /**
@@ -115,5 +133,15 @@ public final class User {
         PaymentFactory paymentFactory = PaymentFactory.getInstance();
         paymentStrategy = paymentFactory.create(input.getCommand());
         return paymentStrategy.pay(input);
+    }
+
+    /**
+     * Calculates the age of a user
+     * @return the age of the user
+     */
+    public int getAge() {
+        LocalDate birthDate = LocalDate.parse(this.birthDate);
+        LocalDate now = LocalDate.now();
+        return Period.between(birthDate, now).getYears();
     }
 }

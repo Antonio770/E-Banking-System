@@ -9,7 +9,7 @@ import lombok.Setter;
 import org.poo.cards.Card;
 import org.poo.cards.CardFactory;
 import org.poo.fileio.CommandInput;
-import org.poo.managers.ExchangeRateManager;
+import org.poo.managers.ExchangeManager;
 import org.poo.transaction.Transaction;
 import org.poo.utils.Utils;
 import org.poo.visitors.Visitable;
@@ -19,7 +19,8 @@ import java.util.ArrayList;
 
 @Getter
 @Setter
-@JsonIgnoreProperties({"transactions", "minBalance", "WARNING_BALANCE"})
+@JsonIgnoreProperties({"transactions", "minBalance", "WARNING_BALANCE",
+                       "discounts", "transactionsMade", "totalSpent"})
 public abstract class Account implements Visitable {
     @JsonProperty("IBAN")
     private String iban;
@@ -32,6 +33,10 @@ public abstract class Account implements Visitable {
     private double minBalance;
     private static final double WARNING_BALANCE = 30;
 
+    private ArrayList<String> discounts;
+    private int transactionsMade;
+    private double totalSpent;
+
     public Account(final CommandInput input) {
         this.iban = Utils.generateIBAN();
         this.balance = 0;
@@ -40,6 +45,9 @@ public abstract class Account implements Visitable {
         this.cards = new ArrayList<>();
         this.transactions = new ArrayList<>();
         this.minBalance = 0;
+        this.discounts = new ArrayList<>();
+        this.transactionsMade = 0;
+        this.totalSpent = 0;
     }
 
     /**
@@ -55,6 +63,14 @@ public abstract class Account implements Visitable {
      */
     public void addFunds(final double amount) {
         this.balance += amount;
+    }
+
+    public void spendFunds(final double amount) {
+        this.balance -= amount;
+    }
+
+    public void addTotalSpent(final double amount) {
+        this.totalSpent += amount;
     }
 
     /**
@@ -103,8 +119,8 @@ public abstract class Account implements Visitable {
      * @return true if the account can pay, false otherwise
      */
     public boolean canPay(final double amount, final String from) {
-        ExchangeRateManager exchangeRateManager = ExchangeRateManager.getInstance();
-        double conversionRate = exchangeRateManager.getConversionRate(from, this.currency);
+        ExchangeManager exchangeManager = ExchangeManager.getInstance();
+        double conversionRate = exchangeManager.getConversionRate(from, this.currency);
         double convertedAmount = amount * conversionRate;
 
         return this.balance >= convertedAmount;

@@ -5,6 +5,8 @@ import lombok.Setter;
 
 import org.poo.accounts.Account;
 import org.poo.cards.Card;
+import org.poo.commerciant.Commerciant;
+import org.poo.fileio.CommerciantInput;
 import org.poo.fileio.UserInput;
 import org.poo.user.User;
 
@@ -17,9 +19,11 @@ import java.util.Map;
 public final class BankManager {
     private static BankManager instance = null;
     private ArrayList<User> users;
+    private ArrayList<Commerciant> commerciants;
 
     private BankManager() {
         users = new ArrayList<User>();
+        commerciants = new ArrayList<Commerciant>();
     }
 
     /**
@@ -39,6 +43,7 @@ public final class BankManager {
      */
     public void resetBankData() {
         users.clear();
+        commerciants.clear();
     }
 
     /**
@@ -49,6 +54,13 @@ public final class BankManager {
         for (UserInput user : usr) {
             User newUser = new User(user);
             this.users.add(newUser);
+        }
+    }
+
+    public void addCommerciants(final List<CommerciantInput> comm) {
+        for (CommerciantInput commerciant : comm) {
+            Commerciant newComm = new Commerciant(commerciant);
+            this.commerciants.add(newComm);
         }
     }
 
@@ -185,5 +197,25 @@ public final class BankManager {
                 }
             }
         }
+    }
+
+    public Commerciant getCommerciantByName(final String name) {
+        for (Commerciant comm : this.commerciants) {
+            if (comm.getName().equals(name)) {
+                return comm;
+            }
+        }
+
+        return null;
+    }
+
+    public Commerciant getCommerciantByIban(final String iban) {
+        for (Commerciant comm : this.commerciants) {
+            if (comm.getAccount().equals(iban)) {
+                return comm;
+            }
+        }
+
+        return null;
     }
 }

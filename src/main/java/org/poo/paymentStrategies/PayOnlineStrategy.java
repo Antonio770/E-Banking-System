@@ -1,8 +1,9 @@
 package org.poo.paymentStrategies;
 
 import org.poo.accounts.Account;
+import org.poo.commerciant.Commerciant;
 import org.poo.managers.BankManager;
-import org.poo.managers.ExchangeRateManager;
+import org.poo.managers.ExchangeManager;
 import org.poo.cards.Card;
 import org.poo.fileio.CommandInput;
 import org.poo.transaction.Transaction;
@@ -11,11 +12,11 @@ import org.poo.utils.Utils;
 
 public final class PayOnlineStrategy implements PaymentStrategy {
     private final BankManager bankManager;
-    private final ExchangeRateManager exchangeRateManager;
+    private final ExchangeManager exchangeManager;
 
     public PayOnlineStrategy() {
         bankManager = BankManager.getInstance();
-        exchangeRateManager = ExchangeRateManager.getInstance();
+        exchangeManager = ExchangeManager.getInstance();
     }
 
     /**
@@ -29,12 +30,15 @@ public final class PayOnlineStrategy implements PaymentStrategy {
             User user = bankManager.getUserByEmail(input.getEmail());
             Card card = bankManager.getCardByNumber(input.getCardNumber());
             Account account = user.getAccountOfCard(card);
+            Commerciant commerciant = bankManager.getCommerciantByName(input.getCommerciant());
+
 
             // Get the conversion rate from the exchange manager
             // and calculate the converted price to be paid
-            double conversionRate = exchangeRateManager.getConversionRate(input.getCurrency(),
-                                                                          account.getCurrency());
-            double convertedPrice = input.getAmount() * conversionRate;
+            double convertedPrice = exchangeManager.getAmount(input.getCurrency(),
+                                                              account.getCurrency(),
+                                                              input.getAmount());
+            double totalPrice = user.getPlan().addFee(convertedPrice, input.getCurrency());
 
             // If the card is frozen, it cannot be used to pay
             if (card.getStatus().equals("frozen")) {
@@ -49,8 +53,10 @@ public final class PayOnlineStrategy implements PaymentStrategy {
             }
 
             // If there is enough money to pay, subtract the amount from the balance
-            if (account.getBalance() >= convertedPrice) {
-                account.setBalance(account.getBalance() - convertedPrice);
+            if (account.getBalance() >= totalPrice) {
+                account.spendFunds(totalPrice);
+
+                commerciant.getCashbackStrategy().cashback(account, convertedPrice, commerciant);
 
                 // Add the transaction to the user's list of transactions
                 Transaction transaction = new Transaction.Builder()
@@ -93,7 +99,7 @@ public final class PayOnlineStrategy implements PaymentStrategy {
                 return true;
             }
 
-            // If the transaction was no possible, add a failed transaction to
+            // If the transaction was not possible, add a failed transaction to
             // the user's list of transactions
             Transaction failedTransaction = new Transaction.Builder()
                                                 .timestamp(input.getTimestamp())
@@ -104,6 +110,7 @@ public final class PayOnlineStrategy implements PaymentStrategy {
             account.addTransaction(failedTransaction);
             return false;
         } catch (NullPointerException e) {
+            System.out.println(e.getMessage());
             return false;
         }
     }
