@@ -8,6 +8,7 @@ import org.poo.cards.Card;
 import org.poo.commerciant.Commerciant;
 import org.poo.fileio.CommerciantInput;
 import org.poo.fileio.UserInput;
+import org.poo.splitPayments.SplitPayment;
 import org.poo.user.User;
 
 import java.util.ArrayList;
@@ -20,10 +21,12 @@ public final class BankManager {
     private static BankManager instance = null;
     private ArrayList<User> users;
     private ArrayList<Commerciant> commerciants;
+    private ArrayList<SplitPayment> splitPayments;
 
     private BankManager() {
         users = new ArrayList<User>();
         commerciants = new ArrayList<Commerciant>();
+        splitPayments = new ArrayList<SplitPayment>();
     }
 
     /**
@@ -213,6 +216,16 @@ public final class BankManager {
         for (Commerciant comm : this.commerciants) {
             if (comm.getAccount().equals(iban)) {
                 return comm;
+            }
+        }
+
+        return null;
+    }
+
+    public SplitPayment getSplitPaymentOfUser(final User user, final String type) {
+        for (SplitPayment sp : this.splitPayments) {
+            if (sp.getType().equals(type) && sp.getUsers().contains(user)) {
+                return sp;
             }
         }
 

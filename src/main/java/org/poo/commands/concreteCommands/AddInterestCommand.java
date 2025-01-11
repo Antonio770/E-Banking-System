@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
+import org.poo.transaction.Transaction;
+import org.poo.user.User;
 import org.poo.visitors.AddInterestVisitor;
 import org.poo.visitors.Visitor;
 
@@ -16,12 +18,24 @@ public final class AddInterestCommand extends Command {
     @Override
     public ObjectNode execute() {
         Account account = getBankManager().getAccount(getInput().getAccount());
+        User user = getBankManager().getUserByAccount(account);
         Visitor visitor = new AddInterestVisitor();
 
-        // Visit the account using the AddInterestVisitor. If the accept method
-        // returns false, the account was not a savings one and an error is
-        // printed to the JSON file by calling notSavingsAccount().
-        if (account.accept(visitor)) {
+        if (account == null || user == null) {
+            return null;
+        }
+
+        double interestAmount = account.accept(visitor);
+        if (interestAmount > 0) {
+            account.addFunds(interestAmount);
+
+            Transaction transaction = new Transaction.Builder()
+                                    .amount(interestAmount)
+                                    .currency(account.getCurrency())
+                                    .description("Interest rate income")
+                                    .timestamp(getInput().getTimestamp())
+                                    .build();
+            user.addTransaction(transaction);
             return null;
         }
 

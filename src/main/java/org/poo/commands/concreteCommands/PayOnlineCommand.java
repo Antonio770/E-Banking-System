@@ -20,16 +20,7 @@ public final class PayOnlineCommand extends Command {
         try {
             // If the card is not owned by the user, print an error to the output file
             if (!user.hasCard(card)) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                ObjectNode objectNode = objectMapper.createObjectNode();
-                objectNode.put("command", getInput().getCommand());
-
-                ObjectNode outputNode = objectMapper.createObjectNode();
-                outputNode.put("timestamp", getInput().getTimestamp());
-                outputNode.put("description", "Card not found");
-
-                objectNode.set("output", outputNode);
-                objectNode.put("timestamp", getInput().getTimestamp());
+                ObjectNode objectNode = getErrorNode("Card not found");
                 return objectNode;
             }
 

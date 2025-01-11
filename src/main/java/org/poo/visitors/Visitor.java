@@ -10,7 +10,7 @@ public interface Visitor {
      * @return true if the operation was successfully applied to the account,
      *         false if not
      */
-    boolean visit(SavingsAccount savingsAccount);
+    double visit(SavingsAccount savingsAccount);
 
     /**
      * Visits a classic account
@@ -18,5 +18,5 @@ public interface Visitor {
      * @return true if the operation was successfully applied to the account,
      *         false if not
      */
-    boolean visit(ClassicAccount classicAccount);
+    double visit(ClassicAccount classicAccount);
 }

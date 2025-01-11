@@ -1,5 +1,6 @@
 package org.poo.commands;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,4 +23,18 @@ public abstract class Command {
      * @return The object node to be written to the output
      */
     public abstract ObjectNode execute();
+
+    public ObjectNode getErrorNode(final String description) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("command", getInput().getCommand());
+
+        ObjectNode outputNode = objectMapper.createObjectNode();
+        outputNode.put("timestamp", getInput().getTimestamp());
+        outputNode.put("description", description);
+
+        objectNode.set("output", outputNode);
+        objectNode.put("timestamp", getInput().getTimestamp());
+        return objectNode;
+    }
 }

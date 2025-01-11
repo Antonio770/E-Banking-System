@@ -1,6 +1,5 @@
 package org.poo.commands.concreteCommands;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
 import org.poo.commands.Command;
@@ -8,7 +7,7 @@ import org.poo.fileio.CommandInput;
 import org.poo.transaction.Transaction;
 import org.poo.user.User;
 
-public class WithdrawSavingsCommand extends Command {
+public final class WithdrawSavingsCommand extends Command {
     public WithdrawSavingsCommand(CommandInput input) {
         super(input);
     }
@@ -23,15 +22,27 @@ public class WithdrawSavingsCommand extends Command {
         }
 
         if (user.getAge() < 21) {
-            Transaction transaction = new Transaction.Builder()
-                                        .timestamp(getInput().getTimestamp())
-                                        .description("You don't have the minimum age required.")
-                                        .build();
-
+            Transaction transaction = getTransaction("You don't have the minimum age required.");
             user.addTransaction(transaction);
             return null;
         }
 
+        Account classicAccount = user.getFirstClassicAccount();
+        if (classicAccount == null) {
+            Transaction transaction = getTransaction("You do not have a classic account.");
+            user.addTransaction(transaction);
+            return null;
+        }
+
+        account.spendFunds(getInput().getAmount());
+        classicAccount.addFunds(getInput().getAmount());
+
         return null;
+    }
+
+    private Transaction getTransaction(final String description) {
+        return new Transaction.Builder().timestamp(getInput().getTimestamp())
+                                        .description(description)
+                                        .build();
     }
 }

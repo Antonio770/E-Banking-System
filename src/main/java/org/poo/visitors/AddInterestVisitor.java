@@ -5,13 +5,12 @@ import org.poo.accounts.SavingsAccount;
 
 public final class AddInterestVisitor implements Visitor {
     @Override
-    public boolean visit(final SavingsAccount savingsAccount) {
-        savingsAccount.addInterest();
-        return true;
+    public double visit(final SavingsAccount savingsAccount) {
+        return savingsAccount.getInterestAmount();
     }
 
     @Override
-    public boolean visit(final ClassicAccount classicAccount) {
-        return false;
+    public double visit(final ClassicAccount classicAccount) {
+        return 0;
     }
 }

@@ -22,6 +22,10 @@ public final class SendMoneyCommand extends Command {
             Account receiverAccount = getBankManager().getAccount(getInput().getReceiver());
             User receiverUser = getBankManager().getUserByAccount(receiverAccount);
 
+            if (senderUser == null || receiverUser == null) {
+                return getErrorNode("User not found");
+            }
+
             // Check if the sender has enough money to send to the receiver.
             // If it does, send the money and add a transaction for
             // both the sender and the receiver.
@@ -39,6 +43,8 @@ public final class SendMoneyCommand extends Command {
 
                 receiverUser.addTransaction(receiverTransaction);
                 receiverAccount.addTransaction(receiverTransaction);
+
+                return null;
             }
         } catch (NullPointerException e) {
             return null;
@@ -62,7 +68,7 @@ public final class SendMoneyCommand extends Command {
 
         return new Transaction.Builder()
                               .timestamp(getInput().getTimestamp())
-                              .description(getInput().getDescription())
+                              .custom("description", getInput().getDescription())
                               .senderIban(getInput().getAccount())
                               .receiverIban(getInput().getReceiver())
                               .stringAmount(convertedAmount + " " + to)

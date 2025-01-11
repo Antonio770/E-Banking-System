@@ -55,7 +55,7 @@ public abstract class Account implements Visitable {
      * @param visitor the visitor that implements a behaviour
      * @return true if the visitor can do the operations, false otherwise
      */
-    public abstract boolean accept(Visitor visitor);
+    public abstract double accept(Visitor visitor);
 
     /**
      * Adds money to the account

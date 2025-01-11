@@ -5,11 +5,10 @@ import org.poo.accounts.Account;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
 import org.poo.managers.ExchangeManager;
-import org.poo.planStrategies.Plan;
 import org.poo.transaction.Transaction;
 import org.poo.user.User;
 
-public class UpgradePlanCommand extends Command {
+public final class UpgradePlanCommand extends Command {
     public UpgradePlanCommand(CommandInput input) {
         super(input);
     }

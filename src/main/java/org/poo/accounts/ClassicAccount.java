@@ -9,7 +9,7 @@ public final class ClassicAccount extends Account {
     }
 
     @Override
-    public boolean accept(final Visitor visitor) {
+    public double accept(final Visitor visitor) {
         return visitor.visit(this);
     }
 }

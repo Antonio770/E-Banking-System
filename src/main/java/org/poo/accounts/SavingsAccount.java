@@ -25,8 +25,13 @@ public final class SavingsAccount extends Account implements Visitable {
         setBalance(getBalance() + getBalance() * interestRate);
     }
 
+    @JsonIgnore
+    public double getInterestAmount() {
+        return getBalance() * interestRate;
+    }
+
     @Override
-    public boolean accept(final Visitor visitor) {
+    public double accept(final Visitor visitor) {
         return visitor.visit(this);
     }
 }

@@ -11,13 +11,13 @@ public final class ChangeInterestVisitor implements Visitor {
     }
 
     @Override
-    public boolean visit(final SavingsAccount savingsAccount) {
+    public double visit(final SavingsAccount savingsAccount) {
         savingsAccount.setInterestRate(interestRate);
-        return true;
+        return 1;
     }
 
     @Override
-    public boolean visit(final ClassicAccount classicAccount) {
-        return false;
+    public double visit(final ClassicAccount classicAccount) {
+        return 0;
     }
 }

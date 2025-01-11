@@ -40,6 +40,10 @@ public final class PayOnlineStrategy implements PaymentStrategy {
                                                               input.getAmount());
             double totalPrice = user.getPlan().addFee(convertedPrice, input.getCurrency());
 
+            if (input.getAmount() <= 0) {
+                return false;
+            }
+
             // If the card is frozen, it cannot be used to pay
             if (card.getStatus().equals("frozen")) {
                 Transaction transaction = new Transaction.Builder()

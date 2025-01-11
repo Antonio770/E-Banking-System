@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Getter
@@ -31,9 +32,12 @@ public final class Transaction {
 
     private String currency;
     private List<String> involvedAccounts;
+    private List<Double> amountForUsers;
     private String error;
 
     private String newPlanType;
+
+    private HashMap<String, String> stringMap;
 
     public static final class Builder {
         // Mandatory fields
@@ -58,9 +62,17 @@ public final class Transaction {
 
         private String currency = null;
         private List<String> involvedAccounts = null;
+        private List<Double> amountForUsers = null;
         private String error = null;
 
         private String newPlanType = null;
+
+        private HashMap<String, String> stringMap = new HashMap<>();
+
+        public Builder custom(final String key, final String value) {
+            stringMap.put(key, value);
+            return this;
+        }
 
         /**
          * Sets the timestamp of the transaction
@@ -213,6 +225,11 @@ public final class Transaction {
             return this;
         }
 
+        public Builder amountForUsers(final List<Double> amounts) {
+            this.amountForUsers = amounts;
+            return this;
+        }
+
         /**
          * Sets the error message of the transaction
          * @param err the error message to be set
@@ -258,8 +275,10 @@ public final class Transaction {
         this.transferType = builder.transferType;
         this.currency = builder.currency;
         this.involvedAccounts = builder.involvedAccounts;
+        this.amountForUsers = builder.amountForUsers;
         this.error = builder.error;
         this.newPlanType = builder.newPlanType;
+        this.stringMap = builder.stringMap;
     }
 
     /**
@@ -273,6 +292,12 @@ public final class Transaction {
 
         output.put("timestamp", this.timestamp);
         output.put("description", this.description);
+
+        if (stringMap != null && !stringMap.isEmpty()) {
+            for (var entry : stringMap.entrySet()) {
+                output.put(entry.getKey(), entry.getValue());
+            }
+        }
 
         if (card != null) {
             output.put("card", this.card);
@@ -330,6 +355,16 @@ public final class Transaction {
             }
 
             output.set("involvedAccounts", accountsNode);
+        }
+
+        if (amountForUsers != null) {
+            ArrayNode amountsNode = objectMapper.createArrayNode();
+
+            for (Double amount : this.amountForUsers) {
+                amountsNode.add(amount);
+            }
+
+            output.set("amountForUsers", amountsNode);
         }
 
         if (error != null) {

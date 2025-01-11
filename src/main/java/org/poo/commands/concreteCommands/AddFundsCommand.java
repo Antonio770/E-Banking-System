@@ -16,7 +16,7 @@ public final class AddFundsCommand extends Command {
             Account account = getBankManager().getAccount(getInput().getAccount());
             account.addFunds(getInput().getAmount());
         } catch (NullPointerException e) {
-            System.out.println(e.getMessage());
+            return null;
         }
 
         return null;

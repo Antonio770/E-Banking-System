@@ -4,11 +4,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
+import org.poo.managers.BankManager;
 import org.poo.managers.ExchangeManager;
+import org.poo.splitPayments.SplitPayment;
 import org.poo.transaction.Transaction;
 import org.poo.user.User;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 public final class SplitPaymentCommand extends Command {
     public SplitPaymentCommand(final CommandInput input) {
@@ -17,58 +22,62 @@ public final class SplitPaymentCommand extends Command {
 
     @Override
     public ObjectNode execute() {
-        double amountPerPerson = getInput().getAmount() / getInput().getAccounts().size();
-        ArrayList<Account> accounts = new ArrayList<Account>();
+        // If the split payment type is "equal", initialize the amountForUser list
+        // to contain equal amounts for each user
+        if (getInput().getSplitPaymentType().equals("equal")) {
+            getInput().setAmountForUsers(initAmountPerUser());
+        }
 
-        ExchangeManager exchangeManager = ExchangeManager.getInstance();
         boolean canPay = true;
         Account failedAccount = null;
+        Iterator<String> accountsIterator = getInput().getAccounts().iterator();
+        Iterator<Double> amountsIterator = getInput().getAmountForUsers().iterator();
 
-        // Check if all accounts have enough money to pay
-        // If there is an account that cannot pay, the split payment will not happen
-        // If there are multiple accounts that cannot pay, only keep the last one
-        for (String iban : getInput().getAccounts()) {
+        while (accountsIterator.hasNext() && amountsIterator.hasNext()) {
+            String iban = accountsIterator.next();
+            Double amount = amountsIterator.next();
+
             Account account = getBankManager().getAccount(iban);
-            accounts.add(account);
 
-            if (!account.canPay(amountPerPerson, getInput().getCurrency())) {
+            if (account == null) {
+                // TODO: error
+                return null;
+            }
+
+            if (!account.canPay(amount, getInput().getCurrency())) {
                 canPay = false;
                 failedAccount = account;
+                break;
             }
         }
 
         // If everyone can pay, split the payment and update every account's balance.
         // Also add the transaction to every involved account and user
         if (canPay) {
-            for (Account account : accounts) {
-                double conversionRate = exchangeManager.getConversionRate(getInput().getCurrency(),
-                                                                          account.getCurrency());
-                double convertedAmount = amountPerPerson * conversionRate;
-
-                account.setBalance(account.getBalance() - convertedAmount);
-                Transaction transaction = getTransaction(amountPerPerson, null);
-
-                User user = getBankManager().getUserByAccount(account);
-                user.addTransaction(transaction);
-                account.addTransaction(transaction);
-            }
-
+            getBankManager().getSplitPayments().add(new SplitPayment(getInput()));
             return null;
         }
 
         // If the split payment failed, add the transaction
         // error to every involved account
-        String error = "Account " + failedAccount.getIban()
-                       + " has insufficient funds for a split payment.";
-        Transaction transaction = getTransaction(amountPerPerson, error);
-
-        for (Account account : accounts) {
-            User user = getBankManager().getUserByAccount(account);
-            account.addTransaction(transaction);
-            user.addTransaction(transaction);
-        }
+        // TODO: add failed transaction for each account and user involved
+//        String error = "Account " + failedAccount.getIban()
+//                       + " has insufficient funds for a split payment.";
+//        Transaction transaction = getTransaction(amountPerPerson, error);
+//
+//        for (Account account : accounts) {
+//            User user = getBankManager().getUserByAccount(account);
+//            account.addTransaction(transaction);
+//            user.addTransaction(transaction);
+//        }
 
         return null;
+    }
+
+    private List<Double> initAmountPerUser() {
+        int nrAccounts = getInput().getAccounts().size();
+        double amountPerUser = getInput().getAmount() / nrAccounts;
+        return new ArrayList<>(Collections.nCopies(nrAccounts, amountPerUser));
     }
 
     /**

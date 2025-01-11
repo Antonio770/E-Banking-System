@@ -20,23 +20,20 @@ public final class ChangeInterestRateCommand extends Command {
         Account account = getBankManager().getAccount(getInput().getAccount());
         Visitor visitor = new ChangeInterestVisitor(getInput().getInterestRate());
 
-        // Visit the account using the ChangeInterestVisitor. If the accept method
-        // returns false, the account was not a savings one and an error is
-        // printed to the JSON file by calling notSavingsAccount().
-        if (account.accept(visitor)) {
-            Transaction transaction = new Transaction.Builder()
-                                          .timestamp(getInput().getTimestamp())
-                                          .description("Interest rate of the account changed to "
-                                                       + getInput().getInterestRate())
-                                          .build();
-
-            User user = getBankManager().getUserByAccount(account);
-            user.addTransaction(transaction);
-            account.addTransaction(transaction);
-            return null;
+        if (account.accept(visitor) == 0) {
+            return notSavingsAccount();
         }
 
-        return notSavingsAccount();
+        Transaction transaction = new Transaction.Builder()
+                                      .timestamp(getInput().getTimestamp())
+                                      .description("Interest rate of the account changed to "
+                                                   + getInput().getInterestRate())
+                                      .build();
+
+        User user = getBankManager().getUserByAccount(account);
+        user.addTransaction(transaction);
+        account.addTransaction(transaction);
+        return null;
     }
 
     private ObjectNode notSavingsAccount() {

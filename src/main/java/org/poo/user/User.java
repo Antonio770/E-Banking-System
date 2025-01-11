@@ -1,5 +1,6 @@
 package org.poo.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
@@ -143,5 +144,16 @@ public final class User {
         LocalDate birthDate = LocalDate.parse(this.birthDate);
         LocalDate now = LocalDate.now();
         return Period.between(birthDate, now).getYears();
+    }
+
+    @JsonIgnore
+    public Account getFirstClassicAccount() {
+        for (Account account : accounts) {
+            if (account != null && account.getType().equals("classic")) {
+                return account;
+            }
+        }
+
+        return null;
     }
 }
