@@ -1,19 +1,19 @@
-package org.poo.planStrategies;
+package org.poo.plans;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public final class StandardPlan implements Plan {
+public final class StudentPlan implements Plan {
     @Override
     public double addFee(final double amount, final String currency) {
-        return amount + amount * 0.002;
+        return amount;
     }
 
     @Override
     public String getType() {
-        return "standard";
+        return "student";
     }
 
     @Override

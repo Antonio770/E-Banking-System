@@ -69,10 +69,10 @@ public final class SendMoneyCommand extends Command {
         return new Transaction.Builder()
                               .timestamp(getInput().getTimestamp())
                               .custom("description", getInput().getDescription())
-                              .senderIban(getInput().getAccount())
-                              .receiverIban(getInput().getReceiver())
-                              .stringAmount(convertedAmount + " " + to)
-                              .transferType(transactionType)
+                              .custom("senderIBAN", getInput().getAccount())
+                              .custom("receiverIBAN", getInput().getReceiver())
+                              .custom("amount", convertedAmount + " " + to)
+                              .custom("transferType", transactionType)
                               .build();
     }
 }

@@ -39,15 +39,16 @@ public final class CashWithdrawalCommand extends Command {
             account.spendFunds(convertedAmount);
 
             Transaction transaction = new Transaction.Builder()
-                                    .amount(getInput().getAmount())
                                     .timestamp(getInput().getTimestamp())
-                                    .description("Cash withdrawal of " + getInput().getAmount())
+                                    .custom("description", "Cash withdrawal of "
+                                            + getInput().getAmount())
+                                    .amount(getInput().getAmount())
                                     .build();
             user.addTransaction(transaction);
         } else {
             Transaction transaction = new Transaction.Builder()
                                     .timestamp(getInput().getTimestamp())
-                                    .description("Insufficient funds")
+                                    .custom("description", "Insufficient funds")
                                     .build();
             user.addTransaction(transaction);
         }

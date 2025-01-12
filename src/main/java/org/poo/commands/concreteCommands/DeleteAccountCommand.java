@@ -33,8 +33,8 @@ public final class DeleteAccountCommand extends Command {
 
             Transaction transaction = new Transaction.Builder()
                                           .timestamp(getInput().getTimestamp())
-                                          .description("Account couldn't be deleted "
-                                                       + "- there are funds remaining")
+                                          .custom("description", "Account couldn't be deleted "
+                                                   + "- there are funds remaining")
                                           .build();
 
             user.addTransaction(transaction);

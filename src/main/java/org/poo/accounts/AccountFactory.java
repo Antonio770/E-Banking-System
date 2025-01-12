@@ -29,6 +29,7 @@ public final class AccountFactory {
     static {
         ACCOUNTS.put("savings", SavingsAccount::new);
         ACCOUNTS.put("classic", ClassicAccount::new);
+        ACCOUNTS.put("business", BusinessAccount::new);
     }
 
     /**

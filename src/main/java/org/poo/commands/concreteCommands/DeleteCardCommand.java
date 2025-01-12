@@ -26,10 +26,10 @@ public final class DeleteCardCommand extends Command {
 
                 Transaction transaction = new Transaction.Builder()
                                               .timestamp(getInput().getTimestamp())
-                                              .description("The card has been destroyed")
-                                              .card(getInput().getCardNumber())
-                                              .cardHolder(user.getEmail())
-                                              .account(account.getIban())
+                                              .custom("description", "The card has been destroyed")
+                                              .custom("card", getInput().getCardNumber())
+                                              .custom("cardHolder", user.getEmail())
+                                              .custom("account", account.getIban())
                                               .build();
 
                 user.addTransaction(transaction);

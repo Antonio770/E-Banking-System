@@ -12,14 +12,15 @@ import org.poo.fileio.CommandInput;
 import org.poo.fileio.UserInput;
 import org.poo.paymentStrategies.PaymentFactory;
 import org.poo.paymentStrategies.PaymentStrategy;
-import org.poo.planStrategies.Plan;
-import org.poo.planStrategies.StandardPlan;
-import org.poo.planStrategies.StudentPlan;
+import org.poo.plans.Plan;
+import org.poo.plans.StandardPlan;
+import org.poo.plans.StudentPlan;
 import org.poo.transaction.Transaction;
 
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,6 +76,10 @@ public final class User {
      */
     public void addTransaction(final Transaction transaction) {
         this.transactions.add(transaction);
+    }
+
+    public void sortTransactionsByTimestamp() {
+        transactions.sort(Comparator.comparingInt(Transaction::getTimestamp));
     }
 
     /**

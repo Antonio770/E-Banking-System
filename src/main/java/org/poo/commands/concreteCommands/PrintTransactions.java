@@ -24,6 +24,9 @@ public final class PrintTransactions extends Command {
         ArrayNode outputNode = objectMapper.createArrayNode();
 
         try {
+            // Sort the transactions by timestamp
+            user.sortTransactionsByTimestamp();
+
             // For every transaction in the user's list, call the getObjectNode
             // method to get the output node in the wanted format
             for (Transaction transaction : user.getTransactions()) {

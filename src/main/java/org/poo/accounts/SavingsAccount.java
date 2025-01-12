@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.fileio.CommandInput;
+import org.poo.user.User;
 import org.poo.visitors.Visitable;
 import org.poo.visitors.Visitor;
 
@@ -28,6 +29,11 @@ public final class SavingsAccount extends Account implements Visitable {
     @JsonIgnore
     public double getInterestAmount() {
         return getBalance() * interestRate;
+    }
+
+    @Override
+    public boolean canPay(double amount, String from, User user) {
+        return super.canPay(amount, from);
     }
 
     @Override

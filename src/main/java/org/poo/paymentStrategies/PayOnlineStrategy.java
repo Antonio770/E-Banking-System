@@ -26,6 +26,10 @@ public final class PayOnlineStrategy implements PaymentStrategy {
      */
     @Override
     public boolean pay(final CommandInput input) {
+        if (input.getAmount() <= 0) {
+            return false;
+        }
+
         try {
             User user = bankManager.getUserByEmail(input.getEmail());
             Card card = bankManager.getCardByNumber(input.getCardNumber());
@@ -40,15 +44,11 @@ public final class PayOnlineStrategy implements PaymentStrategy {
                                                               input.getAmount());
             double totalPrice = user.getPlan().addFee(convertedPrice, input.getCurrency());
 
-            if (input.getAmount() <= 0) {
-                return false;
-            }
-
             // If the card is frozen, it cannot be used to pay
             if (card.getStatus().equals("frozen")) {
                 Transaction transaction = new Transaction.Builder()
                                               .timestamp(input.getTimestamp())
-                                              .description("The card is frozen")
+                                              .custom("description", "The card is frozen")
                                               .build();
 
                 user.addTransaction(transaction);
@@ -57,7 +57,7 @@ public final class PayOnlineStrategy implements PaymentStrategy {
             }
 
             // If there is enough money to pay, subtract the amount from the balance
-            if (account.getBalance() >= totalPrice) {
+            if (account.canPay(totalPrice, account.getCurrency(), user)) {
                 account.spendFunds(totalPrice);
 
                 commerciant.getCashbackStrategy().cashback(account, convertedPrice, commerciant);
@@ -65,9 +65,9 @@ public final class PayOnlineStrategy implements PaymentStrategy {
                 // Add the transaction to the user's list of transactions
                 Transaction transaction = new Transaction.Builder()
                                               .timestamp(input.getTimestamp())
-                                              .description("Card payment")
+                                              .custom("description", "Card payment")
                                               .amount(convertedPrice)
-                                              .commerciant(input.getCommerciant())
+                                              .custom("commerciant", input.getCommerciant())
                                               .build();
 
                 user.addTransaction(transaction);
@@ -77,10 +77,10 @@ public final class PayOnlineStrategy implements PaymentStrategy {
                 if (card.getType().equals("OneTime")) {
                     Transaction destroyTransaction = new Transaction.Builder()
                                                         .timestamp(input.getTimestamp())
-                                                        .description("The card has been destroyed")
-                                                        .card(input.getCardNumber())
-                                                        .cardHolder(user.getEmail())
-                                                        .account(account.getIban())
+                                                        .custom("description", "The card has been destroyed")
+                                                        .custom("card", input.getCardNumber())
+                                                        .custom("cardHolder", user.getEmail())
+                                                        .custom("account", account.getIban())
                                                         .build();
 
                     user.addTransaction(destroyTransaction);
@@ -90,10 +90,10 @@ public final class PayOnlineStrategy implements PaymentStrategy {
 
                     Transaction createTransaction = new Transaction.Builder()
                                                         .timestamp(input.getTimestamp())
-                                                        .description("New card created")
-                                                        .card(card.getCardNumber())
-                                                        .cardHolder(user.getEmail())
-                                                        .account(account.getIban())
+                                                        .custom("description", "New card created")
+                                                        .custom("card", card.getCardNumber())
+                                                        .custom("cardHolder", user.getEmail())
+                                                        .custom("account", account.getIban())
                                                         .build();
 
                     user.addTransaction(createTransaction);
@@ -107,7 +107,7 @@ public final class PayOnlineStrategy implements PaymentStrategy {
             // the user's list of transactions
             Transaction failedTransaction = new Transaction.Builder()
                                                 .timestamp(input.getTimestamp())
-                                                .description("Insufficient funds")
+                                                .custom("description", "Insufficient funds")
                                                 .build();
 
             user.addTransaction(failedTransaction);

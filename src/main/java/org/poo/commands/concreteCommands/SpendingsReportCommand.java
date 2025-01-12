@@ -66,17 +66,17 @@ public final class SpendingsReportCommand extends Command {
         for (Transaction transaction : account.getTransactions()) {
             if (transaction.getTimestamp() >= getInput().getStartTimestamp()
                 && transaction.getTimestamp() <= getInput().getEndTimestamp()
-                && transaction.getDescription().equals("Card payment")) {
+                && transaction.getStringMap().get("description").equals("Card payment")) {
 
                 transactionsNode.add(transaction.getObjectNode());
-                String commerciant = transaction.getCommerciant();
+                String commerciant = transaction.getStringMap().get("commerciant");
                 double amount = transaction.getAmount();
 
                 // If the commerciant is not in the TreeMap, add it.
                 // If it's already in the TreeMap, update the total money sent
                 // to that commerciant
-                commerciants.put(commerciant,
-                                 commerciants.getOrDefault(commerciant, 0.0) + amount);
+                double total = commerciants.getOrDefault(commerciant, 0.0);
+                commerciants.put(commerciant, total + amount);
             }
         }
 

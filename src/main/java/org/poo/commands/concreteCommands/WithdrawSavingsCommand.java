@@ -42,7 +42,7 @@ public final class WithdrawSavingsCommand extends Command {
 
     private Transaction getTransaction(final String description) {
         return new Transaction.Builder().timestamp(getInput().getTimestamp())
-                                        .description(description)
+                                        .custom("description", description)
                                         .build();
     }
 }

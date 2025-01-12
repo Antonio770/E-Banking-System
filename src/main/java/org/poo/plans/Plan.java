@@ -1,4 +1,4 @@
-package org.poo.planStrategies;
+package org.poo.plans;
 
 public interface Plan {
     /**

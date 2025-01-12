@@ -16,7 +16,7 @@ public final class AddAccountCommand extends Command {
     public ObjectNode execute() {
         Transaction transaction = new Transaction.Builder()
                                       .timestamp(getInput().getTimestamp())
-                                      .description("New account created")
+                                      .custom("description", "New account created")
                                       .build();
         try {
             User user = getBankManager().getUserByEmail(getInput().getEmail());

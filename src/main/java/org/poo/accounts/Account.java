@@ -11,6 +11,7 @@ import org.poo.cards.CardFactory;
 import org.poo.fileio.CommandInput;
 import org.poo.managers.ExchangeManager;
 import org.poo.transaction.Transaction;
+import org.poo.user.User;
 import org.poo.utils.Utils;
 import org.poo.visitors.Visitable;
 import org.poo.visitors.Visitor;
@@ -71,6 +72,8 @@ public abstract class Account implements Visitable {
 
     public void addTotalSpent(final double amount) {
         this.totalSpent += amount;
+
+        // TODO: upgrade plan if a certain amount of money has been spent
     }
 
     /**
@@ -120,9 +123,9 @@ public abstract class Account implements Visitable {
      */
     public boolean canPay(final double amount, final String from) {
         ExchangeManager exchangeManager = ExchangeManager.getInstance();
-        double conversionRate = exchangeManager.getConversionRate(from, this.currency);
-        double convertedAmount = amount * conversionRate;
-
+        double convertedAmount = exchangeManager.getAmount(from, currency, amount);
         return this.balance >= convertedAmount;
     }
+
+    public abstract boolean canPay(final double amount, final String from, final User user);
 }

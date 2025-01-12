@@ -31,12 +31,12 @@ public final class CreateCardCommand extends Command {
             Card card = account.getCards().getLast();
 
             Transaction transaction = new Transaction.Builder()
-                                                     .timestamp(getInput().getTimestamp())
-                                                     .description("New card created")
-                                                     .card(card.getCardNumber())
-                                                     .cardHolder(user.getEmail())
-                                                     .account(account.getIban())
-                                                     .build();
+                                     .timestamp(getInput().getTimestamp())
+                                     .custom("description", "New card created")
+                                     .custom("card", card.getCardNumber())
+                                     .custom("cardHolder", user.getEmail())
+                                     .custom("account", account.getIban())
+                                     .build();
 
             user.addTransaction(transaction);
             account.addTransaction(transaction);

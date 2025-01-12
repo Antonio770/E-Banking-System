@@ -30,10 +30,10 @@ public final class AddInterestCommand extends Command {
             account.addFunds(interestAmount);
 
             Transaction transaction = new Transaction.Builder()
-                                    .amount(interestAmount)
-                                    .currency(account.getCurrency())
-                                    .description("Interest rate income")
                                     .timestamp(getInput().getTimestamp())
+                                    .custom("description", "Interest rate income")
+                                    .amount(interestAmount)
+                                    .custom("currency", account.getCurrency())
                                     .build();
             user.addTransaction(transaction);
             return null;

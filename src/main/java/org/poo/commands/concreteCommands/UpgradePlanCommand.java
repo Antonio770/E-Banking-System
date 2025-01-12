@@ -37,10 +37,10 @@ public final class UpgradePlanCommand extends Command {
             user.setPlan(user.getPlan().upgradeTo(newPlan));
 
             Transaction transaction = new Transaction.Builder()
-                                    .accountIban(getInput().getAccount())
-                                    .description("Upgrade plan")
-                                    .newPlanType(newPlan)
                                     .timestamp(getInput().getTimestamp())
+                                    .custom("description", "Upgrade plan")
+                                    .custom("accountIBAN", getInput().getAccount())
+                                    .custom("newPlanType", newPlan)
                                     .build();
 
             user.addTransaction(transaction);

@@ -50,8 +50,8 @@ public final class CheckCardStatusCommand extends Command {
         if (status.equals("frozen")) {
             Transaction transaction = new Transaction.Builder()
                                           .timestamp(getInput().getTimestamp())
-                                          .description("You have reached the minimum amount "
-                                                        + "of funds, the card will be frozen")
+                                          .custom("description", "You have reached the minimum" +
+                                                  "amount of funds, the card will be frozen")
                                           .build();
             user.addTransaction(transaction);
             account.addTransaction(transaction);

@@ -44,7 +44,7 @@ public final class BankTransferStrategy implements PaymentStrategy {
             }
 
             // If there is enough money in the account, pay the amount
-            if (sender.getBalance() >= totalSenderAmount) {
+            if (sender.canPay(totalSenderAmount, sender.getCurrency(), senderUser)) {
                 sender.spendFunds(totalSenderAmount);
 
                 if (commerciant != null) {
@@ -60,7 +60,7 @@ public final class BankTransferStrategy implements PaymentStrategy {
             // There is not enough money to pay the required amount
             Transaction transaction = new Transaction.Builder()
                                           .timestamp(input.getTimestamp())
-                                          .description("Insufficient funds")
+                                          .custom("description", "Insufficient funds")
                                           .build();
 
             User user = bankManager.getUserByEmail(input.getEmail());
