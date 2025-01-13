@@ -1,4 +1,4 @@
-package org.poo.commands.concreteCommands;
+package org.poo.commands.concreteCommands.userCommands;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
-import org.poo.transaction.Transaction;
 
 public final class ReportCommand extends Command {
     public ReportCommand(final CommandInput input) {
@@ -39,15 +38,15 @@ public final class ReportCommand extends Command {
         }
 
         ArrayNode transactionsNode = objectMapper.createArrayNode();
+        int start = getInput().getStartTimestamp();
+        int end = getInput().getEndTimestamp();
 
-        // Iterate through the list of transactions of the account and
-        // call the getObjectNode() method to get the output node format
-        for (Transaction transaction : account.getTransactions()) {
-            if (transaction.getTimestamp() >= getInput().getStartTimestamp()
-                && transaction.getTimestamp() <= getInput().getEndTimestamp()) {
-                transactionsNode.add(transaction.getObjectNode());
-            }
-        }
+        account.getTransactions()
+               .stream()
+               .filter(tr -> tr.getTimestamp() >= start)
+               .filter(tr -> tr.getTimestamp() <= end)
+               .forEach(tr -> transactionsNode.add(tr.getObjectNode()));
+
 
         outputNode.set("transactions", transactionsNode);
         returnNode.set("output", outputNode);

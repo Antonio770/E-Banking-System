@@ -1,6 +1,14 @@
 package org.poo.commands;
 
-import org.poo.commands.concreteCommands.*;
+import org.poo.commands.concreteCommands.accountCommands.*;
+import org.poo.commands.concreteCommands.businessCommands.AddAssociateCommand;
+import org.poo.commands.concreteCommands.businessCommands.BusinessReportCommand;
+import org.poo.commands.concreteCommands.businessCommands.ChangeLimitCommand;
+import org.poo.commands.concreteCommands.cardCommands.CheckCardStatusCommand;
+import org.poo.commands.concreteCommands.cardCommands.CreateCardCommand;
+import org.poo.commands.concreteCommands.cardCommands.DeleteCardCommand;
+import org.poo.commands.concreteCommands.paymentCommands.*;
+import org.poo.commands.concreteCommands.userCommands.*;
 import org.poo.fileio.CommandInput;
 
 import java.util.HashMap;
@@ -51,6 +59,10 @@ public final class CommandFactory {
         COMMANDS.put("upgradePlan", UpgradePlanCommand::new);
         COMMANDS.put("acceptSplitPayment", AcceptSplitCommand::new);
         COMMANDS.put("rejectSplitPayment", RejectSplitCommand::new);
+        COMMANDS.put("addNewBusinessAssociate", AddAssociateCommand::new);
+        COMMANDS.put("changeSpendingLimit", ChangeLimitCommand::new);
+        COMMANDS.put("changeDepositLimit", ChangeLimitCommand::new);
+        COMMANDS.put("businessReport", BusinessReportCommand::new);
     }
 
     /**

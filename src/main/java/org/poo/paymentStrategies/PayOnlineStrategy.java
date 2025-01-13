@@ -57,7 +57,7 @@ public final class PayOnlineStrategy implements PaymentStrategy {
             }
 
             // If there is enough money to pay, subtract the amount from the balance
-            if (account.canPay(totalPrice, account.getCurrency(), user)) {
+            if (account.canPay(totalPrice, account.getCurrency())) {
                 account.spendFunds(totalPrice);
 
                 commerciant.getCashbackStrategy().cashback(account, convertedPrice, commerciant);
@@ -65,9 +65,10 @@ public final class PayOnlineStrategy implements PaymentStrategy {
                 // Add the transaction to the user's list of transactions
                 Transaction transaction = new Transaction.Builder()
                                               .timestamp(input.getTimestamp())
-                                              .custom("description", "Card payment")
                                               .amount(convertedPrice)
+                                              .custom("description", "Card payment")
                                               .custom("commerciant", input.getCommerciant())
+                                              .custom("email", input.getEmail())
                                               .build();
 
                 user.addTransaction(transaction);
@@ -77,7 +78,8 @@ public final class PayOnlineStrategy implements PaymentStrategy {
                 if (card.getType().equals("OneTime")) {
                     Transaction destroyTransaction = new Transaction.Builder()
                                                         .timestamp(input.getTimestamp())
-                                                        .custom("description", "The card has been destroyed")
+                                                        .custom("description",
+                                                                "The card has been destroyed")
                                                         .custom("card", input.getCardNumber())
                                                         .custom("cardHolder", user.getEmail())
                                                         .custom("account", account.getIban())

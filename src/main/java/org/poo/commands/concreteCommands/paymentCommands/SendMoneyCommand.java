@@ -1,4 +1,4 @@
-package org.poo.commands.concreteCommands;
+package org.poo.commands.concreteCommands.paymentCommands;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
@@ -68,11 +68,13 @@ public final class SendMoneyCommand extends Command {
 
         return new Transaction.Builder()
                               .timestamp(getInput().getTimestamp())
+                              .amount(convertedAmount)
                               .custom("description", getInput().getDescription())
                               .custom("senderIBAN", getInput().getAccount())
                               .custom("receiverIBAN", getInput().getReceiver())
                               .custom("amount", convertedAmount + " " + to)
                               .custom("transferType", transactionType)
+                              .custom("email", getInput().getEmail())
                               .build();
     }
 }

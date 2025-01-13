@@ -1,12 +1,12 @@
-package org.poo.commands.concreteCommands;
+package org.poo.commands.concreteCommands.accountCommands;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
 
-public final class SetMinBalanceCommand extends Command {
-    public SetMinBalanceCommand(final CommandInput input) {
+public final class AddFundsCommand extends Command {
+    public AddFundsCommand(final CommandInput input) {
         super(input);
     }
 
@@ -14,11 +14,10 @@ public final class SetMinBalanceCommand extends Command {
     public ObjectNode execute() {
         try {
             Account account = getBankManager().getAccount(getInput().getAccount());
-            account.setMinBalance(getInput().getMinBalance());
+            account.addFunds(getInput().getAmount());
         } catch (NullPointerException e) {
-            System.out.println(e.getMessage());
+            return null;
         }
-
 
         return null;
     }

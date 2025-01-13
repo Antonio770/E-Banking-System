@@ -1,4 +1,4 @@
-package org.poo.commands.concreteCommands;
+package org.poo.commands.concreteCommands.cardCommands;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
@@ -33,6 +33,7 @@ public final class CreateCardCommand extends Command {
             Transaction transaction = new Transaction.Builder()
                                      .timestamp(getInput().getTimestamp())
                                      .custom("description", "New card created")
+                                     .custom("email", getInput().getEmail())
                                      .custom("card", card.getCardNumber())
                                      .custom("cardHolder", user.getEmail())
                                      .custom("account", account.getIban())

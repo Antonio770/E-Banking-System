@@ -1,4 +1,4 @@
-package org.poo.commands.concreteCommands;
+package org.poo.commands.concreteCommands.accountCommands;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
@@ -17,6 +17,7 @@ public final class AddAccountCommand extends Command {
         Transaction transaction = new Transaction.Builder()
                                       .timestamp(getInput().getTimestamp())
                                       .custom("description", "New account created")
+                                      .custom("email", getInput().getEmail())
                                       .build();
         try {
             User user = getBankManager().getUserByEmail(getInput().getEmail());

@@ -1,4 +1,4 @@
-package org.poo.commands.concreteCommands;
+package org.poo.commands.concreteCommands.cardCommands;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;

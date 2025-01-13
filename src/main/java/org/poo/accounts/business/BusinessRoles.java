@@ -1,4 +1,4 @@
-package org.poo.accounts;
+package org.poo.accounts.business;
 
 public enum BusinessRoles {
     OWNER,

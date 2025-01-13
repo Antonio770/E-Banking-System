@@ -13,9 +13,4 @@ public final class ClassicAccount extends Account {
     public double accept(final Visitor visitor) {
         return visitor.visit(this);
     }
-
-    @Override
-    public boolean canPay(double amount, String from, User user) {
-        return super.canPay(amount, from);
-    }
 }

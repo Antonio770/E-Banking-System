@@ -1,6 +1,6 @@
 package org.poo.visitors;
 
-import org.poo.accounts.BusinessAccount;
+import org.poo.accounts.business.BusinessAccount;
 import org.poo.accounts.ClassicAccount;
 import org.poo.accounts.SavingsAccount;
 

@@ -8,6 +8,8 @@ import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -94,12 +96,13 @@ public final class Transaction {
         output.put("timestamp", this.timestamp);
 
         if (stringMap != null && !stringMap.isEmpty()) {
-            for (var entry : stringMap.entrySet()) {
-                output.put(entry.getKey(), entry.getValue());
-            }
+            stringMap.entrySet().stream()
+                     .filter(entry -> !entry.getKey().equals("email"))
+                     .forEach(entry -> output.put(entry.getKey(), entry.getValue()));
         }
 
-        if (amount != null) {
+        // Only put the double amount filed to output node if there is no string amount field
+        if (amount != null && (stringMap == null || !stringMap.containsKey("amount"))) {
             output.put("amount", this.amount);
         }
 

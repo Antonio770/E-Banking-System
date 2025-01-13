@@ -44,7 +44,7 @@ public final class BankTransferStrategy implements PaymentStrategy {
             }
 
             // If there is enough money in the account, pay the amount
-            if (sender.canPay(totalSenderAmount, sender.getCurrency(), senderUser)) {
+            if (sender.canPay(totalSenderAmount, sender.getCurrency())) {
                 sender.spendFunds(totalSenderAmount);
 
                 if (commerciant != null) {

@@ -1,4 +1,4 @@
-package org.poo.commands.concreteCommands;
+package org.poo.commands.concreteCommands.accountCommands;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
@@ -35,7 +35,7 @@ public final class CashWithdrawalCommand extends Command {
         double feeAdded = user.getPlan().addFee(getInput().getAmount(), "RON");
         double convertedAmount = exchangeManager.getAmount("RON", account.getCurrency(), feeAdded);
 
-        if (account.getBalance() >= convertedAmount) {
+        if (account.canPay(convertedAmount, account.getCurrency())) {
             account.spendFunds(convertedAmount);
 
             Transaction transaction = new Transaction.Builder()
@@ -45,14 +45,14 @@ public final class CashWithdrawalCommand extends Command {
                                     .amount(getInput().getAmount())
                                     .build();
             user.addTransaction(transaction);
-        } else {
-            Transaction transaction = new Transaction.Builder()
-                                    .timestamp(getInput().getTimestamp())
-                                    .custom("description", "Insufficient funds")
-                                    .build();
-            user.addTransaction(transaction);
+            return null;
         }
 
+        Transaction transaction = new Transaction.Builder()
+                                .timestamp(getInput().getTimestamp())
+                                .custom("description", "Insufficient funds")
+                                .build();
+        user.addTransaction(transaction);
         return null;
     }
 }

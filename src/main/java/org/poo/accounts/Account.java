@@ -51,11 +51,7 @@ public abstract class Account implements Visitable {
         this.totalSpent = 0;
     }
 
-    /**
-     * Accepts a visitor
-     * @param visitor the visitor that implements a behaviour
-     * @return true if the visitor can do the operations, false otherwise
-     */
+
     public abstract double accept(Visitor visitor);
 
     /**
@@ -126,6 +122,4 @@ public abstract class Account implements Visitable {
         double convertedAmount = exchangeManager.getAmount(from, currency, amount);
         return this.balance >= convertedAmount;
     }
-
-    public abstract boolean canPay(final double amount, final String from, final User user);
 }

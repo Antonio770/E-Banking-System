@@ -32,11 +32,6 @@ public final class SavingsAccount extends Account implements Visitable {
     }
 
     @Override
-    public boolean canPay(double amount, String from, User user) {
-        return super.canPay(amount, from);
-    }
-
-    @Override
     public double accept(final Visitor visitor) {
         return visitor.visit(this);
     }
