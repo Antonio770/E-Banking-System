@@ -19,25 +19,31 @@ public class ChangeLimitCommand extends Command {
         Account account = getBankManager().getAccount(getInput().getAccount());
         double amount = getInput().getAmount();
 
-        if (account != null && account.getType().equals("business")) {
-            BusinessAccount businessAccount = (BusinessAccount) account;
+        // Account not of type "business"
+        if (account == null || !account.getType().equals("business")) {
+            return getErrorNode("This is not a business account");
+        }
 
-            if (businessAccount.getRole(user) == BusinessRoles.OWNER) {
-                switch (getInput().getCommand()) {
-                    case "changeSpendinglimit":
-                        businessAccount.setSpendingLimit(amount);
-                        break;
-                    case "changeDepositLimit":
-                        businessAccount.setDepositLimit(amount);
-                        break;
-                    default:
-                        break;
-                }
+        BusinessAccount businessAccount = (BusinessAccount) account;
 
-                return null;
+        // The user doesn't have permission to change the limit
+        if (businessAccount.getRole(user) != BusinessRoles.OWNER) {
+            if (getInput().getCommand().equals("changeDepositLimit")) {
+                return getErrorNode("You must be owner in order to change deposit limit.");
+            } else {
+                return getErrorNode("You must be owner in order to change spending limit.");
             }
+        }
 
-            // TODO: you are not authorized to make this transaction
+        switch (getInput().getCommand()) {
+            case "changeSpendingLimit":
+                businessAccount.setSpendingLimit(amount);
+                break;
+            case "changeDepositLimit":
+                businessAccount.setDepositLimit(amount);
+                break;
+            default:
+                break;
         }
 
         return null;

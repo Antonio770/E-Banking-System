@@ -90,6 +90,10 @@ public final class Transaction {
      * @return the object node to be written to the output JSON file
      */
     public ObjectNode getObjectNode() {
+        if (stringMap.containsValue("Added funds")) {
+            return null;
+        }
+
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode output = objectMapper.createObjectNode();
 

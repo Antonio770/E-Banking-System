@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
+import org.poo.managers.ExchangeManager;
 import org.poo.transaction.Transaction;
 import org.poo.user.User;
 
@@ -22,27 +23,41 @@ public final class WithdrawSavingsCommand extends Command {
         }
 
         if (user.getAge() < 21) {
-            Transaction transaction = getTransaction("You don't have the minimum age required.");
+            Transaction transaction = getSimpleTransaction(getInput().getTimestamp(),
+                            "You don't have the minimum age required.");
             user.addTransaction(transaction);
+            account.addTransaction(transaction);
             return null;
         }
 
-        Account classicAccount = user.getFirstClassicAccount();
+        Account classicAccount = user.getFirstClassicAccount(getInput().getCurrency());
         if (classicAccount == null) {
-            Transaction transaction = getTransaction("You do not have a classic account.");
+            Transaction transaction = getSimpleTransaction(getInput().getTimestamp(),
+                            "You do not have a classic account.");
             user.addTransaction(transaction);
+            account.addTransaction(transaction);
             return null;
         }
 
-        account.spendFunds(getInput().getAmount());
-        classicAccount.addFunds(getInput().getAmount());
+        if (account.canPay(getInput().getAmount(), getInput().getCurrency())) {
+            account.spendFunds(getInput().getAmount());
+            classicAccount.addFunds(getInput().getAmount());
+
+            user.addTransaction(getTransaction(classicAccount.getIban()));
+            user.addTransaction(getTransaction(classicAccount.getIban()));
+            account.addTransaction(getTransaction(classicAccount.getIban()));
+        }
 
         return null;
     }
 
-    private Transaction getTransaction(final String description) {
-        return new Transaction.Builder().timestamp(getInput().getTimestamp())
-                                        .custom("description", description)
-                                        .build();
+    private Transaction getTransaction(final String classic) {
+        return new Transaction.Builder()
+                    .timestamp(getInput().getTimestamp())
+                    .amount(getInput().getAmount())
+                    .custom("description", "Savings withdrawal")
+                    .custom("classicAccountIBAN", classic)
+                    .custom("savingsAccountIBAN", getInput().getAccount())
+                    .build();
     }
 }

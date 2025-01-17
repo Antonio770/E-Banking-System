@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.poo.cashbackStrategies.CashbackStrategy;
 import org.poo.cashbackStrategies.NrOfTransactions;
-import org.poo.cashbackStrategies.SpendingTreshold;
+import org.poo.cashbackStrategies.SpendingThreshold;
 import org.poo.fileio.CommerciantInput;
 
 @Getter
@@ -25,7 +25,7 @@ public final class Commerciant {
         if (input.getCashbackStrategy().equals("nrOfTransactions")) {
             cashbackStrategy = new NrOfTransactions();
         } else if (input.getCashbackStrategy().equals("spendingThreshold")) {
-            cashbackStrategy = new SpendingTreshold();
+            cashbackStrategy = new SpendingThreshold();
         }
     }
 }

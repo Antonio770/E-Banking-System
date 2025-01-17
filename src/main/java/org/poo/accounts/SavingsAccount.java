@@ -19,13 +19,6 @@ public final class SavingsAccount extends Account implements Visitable {
         this.interestRate = input.getInterestRate();
     }
 
-    /**
-     * Adds the interest to the account's total balance
-     */
-    public void addInterest() {
-        setBalance(getBalance() + getBalance() * interestRate);
-    }
-
     @JsonIgnore
     public double getInterestAmount() {
         return getBalance() * interestRate;

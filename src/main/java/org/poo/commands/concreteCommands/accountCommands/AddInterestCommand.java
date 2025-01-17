@@ -36,10 +36,12 @@ public final class AddInterestCommand extends Command {
                                     .custom("currency", account.getCurrency())
                                     .build();
             user.addTransaction(transaction);
+            account.addTransaction(transaction);
             return null;
         }
 
-        return notSavingsAccount();
+//        return notSavingsAccount();
+        return null;
     }
 
     private ObjectNode notSavingsAccount() {

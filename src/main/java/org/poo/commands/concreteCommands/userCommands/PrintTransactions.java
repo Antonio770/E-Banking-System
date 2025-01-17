@@ -29,9 +29,9 @@ public final class PrintTransactions extends Command {
 
             // For every transaction in the user's list, call the getObjectNode
             // method to get the output node in the wanted format
-            for (Transaction transaction : user.getTransactions()) {
-                outputNode.add(transaction.getObjectNode());
-            }
+            user.getTransactions().stream()
+                    .filter(tr -> !tr.getStringMap().containsValue("Added funds"))
+                    .forEach(tr -> outputNode.add(tr.getObjectNode()));
 
             objectNode.set("output", outputNode);
             objectNode.put("timestamp", getInput().getTimestamp());

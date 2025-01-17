@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.poo.managers.BankManager;
 import org.poo.fileio.CommandInput;
+import org.poo.transaction.Transaction;
 
 @Getter
 @Setter
@@ -36,5 +37,11 @@ public abstract class Command {
         objectNode.set("output", outputNode);
         objectNode.put("timestamp", getInput().getTimestamp());
         return objectNode;
+    }
+
+    public Transaction getSimpleTransaction(final int timestamp, final String description) {
+        return new Transaction.Builder().timestamp(timestamp)
+                                        .custom("description", description)
+                                        .build();
     }
 }

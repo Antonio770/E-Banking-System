@@ -76,26 +76,11 @@ public final class Main {
         File file = new File(CheckerConstants.TESTS_PATH + filePath1);
         ObjectInput inputData = objectMapper.readValue(file, ObjectInput.class);
 
-        ArrayNode output = objectMapper.createArrayNode();
+        if (filePath1.equals("test18_large_input_part1.json")) {
+            System.out.println();
+        }
 
-        /*
-         * TODO Implement your function here
-         *
-         * How to add output to the output array?
-         * There are multiple ways to do this, here is one example:
-         *
-         * ObjectMapper mapper = new ObjectMapper();
-         *
-         * ObjectNode objectNode = mapper.createObjectNode();
-         * objectNode.put("field_name", "field_value");
-         *
-         * ArrayNode arrayNode = mapper.createArrayNode();
-         * arrayNode.add(objectNode);
-         *
-         * output.add(arrayNode);
-         * output.add(objectNode);
-         *
-         */
+        ArrayNode output = objectMapper.createArrayNode();
 
         BankManager bankManager = BankManager.getInstance();
         ExchangeManager exchangeManager = ExchangeManager.getInstance();

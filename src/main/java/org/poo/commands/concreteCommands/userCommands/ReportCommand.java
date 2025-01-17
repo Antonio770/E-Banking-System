@@ -45,6 +45,7 @@ public final class ReportCommand extends Command {
                .stream()
                .filter(tr -> tr.getTimestamp() >= start)
                .filter(tr -> tr.getTimestamp() <= end)
+               .filter(tr -> !tr.getStringMap().containsValue("Added funds"))
                .forEach(tr -> transactionsNode.add(tr.getObjectNode()));
 
 

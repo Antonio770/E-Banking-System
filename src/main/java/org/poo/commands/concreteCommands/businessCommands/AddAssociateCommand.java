@@ -20,6 +20,12 @@ public class AddAssociateCommand extends Command {
 
         if (account != null && account.getType().equals("business")) {
             BusinessAccount businessAccount = (BusinessAccount) account;
+
+            if (businessAccount.getUsers().contains(user)) {
+                // TODO: The user is already an associate of the account.
+                return null;
+            }
+
             businessAccount.addAssociate(user, role);
         }
 

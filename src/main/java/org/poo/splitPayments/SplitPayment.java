@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.poo.accounts.Account;
 import org.poo.fileio.CommandInput;
 import org.poo.managers.BankManager;
+import org.poo.managers.ExchangeManager;
 import org.poo.transaction.Transaction;
 import org.poo.user.User;
 
@@ -41,7 +42,8 @@ public final class SplitPayment {
         ArrayList<User> userList = new ArrayList<User>();
 
         for (Account account : accounts) {
-            User user = bankManager.getUserByAccount(account);
+//            User user = bankManager.getUserByAccount(account);
+            User user = account.ownerOfAccount();
             if (user != null) {
                 userList.add(user);
             }
@@ -50,7 +52,7 @@ public final class SplitPayment {
         return userList;
     }
 
-    private ArrayList<Account> initAccounts(List<String> accounts) {
+    private ArrayList<Account> initAccounts(final List<String> accounts) {
         ArrayList<Account> accountsList = new ArrayList<Account>();
 
         for (String account : accounts) {
@@ -63,32 +65,34 @@ public final class SplitPayment {
         return accountsList;
     }
 
-    public void acceptSplitPayment(User user) {
-        Account accountConfirmed = null;
+    public void acceptSplitPayment(final User user) {
+        ArrayList<Account> accountsConfirmed = new ArrayList<Account>();
 
         for (Account account : accounts) {
             if (user.getAccounts().contains(account)) {
-                accountConfirmed = account;
-                break;
+                accountsConfirmed.add(account);
             }
         }
 
-        pendingAccounts.remove(accountConfirmed);
+        pendingAccounts.removeAll(accountsConfirmed);
 
         if (pendingAccounts.isEmpty()) {
             makeSplitPayment();
         }
     }
 
-    public void rejectSplitPayment(User user) {
-        // TODO: reject the payment
+    public void rejectSplitPayment(final User user) {
+        addErrorTransactions("One user rejected the payment.");
+        pendingAccounts.clear();
     }
 
     private void makeSplitPayment() {
         Account failedAccount = canEveryonePay();
 
         if (failedAccount != null) {
-            addErrorTransactions(failedAccount);
+            addErrorTransactions("Account " + failedAccount.getIban()
+                                 + " has insufficient funds for a split payment.");
+            pendingAccounts.clear();
             return;
         }
 
@@ -98,12 +102,19 @@ public final class SplitPayment {
         while (accountIterator.hasNext() && amountIterator.hasNext()) {
             Account account = accountIterator.next();
             double amount = amountIterator.next();
-            account.spendFunds(amount);
+
+            ExchangeManager exchangeManager = ExchangeManager.getInstance();
+            double convAmount = exchangeManager.getAmount(currency, account.getCurrency(), amount);
+            account.spendFunds(convAmount);
 
             Transaction transaction = getSuccessfullTransaction();
-            User user = bankManager.getUserByAccount(account);
+//            User user = bankManager.getUserByAccount(account);
+            User user = account.ownerOfAccount();
             user.addTransaction(transaction);
+            account.addTransaction(transaction);
         }
+
+        pendingAccounts.clear();
     }
 
     private Account canEveryonePay() {
@@ -124,10 +135,25 @@ public final class SplitPayment {
         return null;
     }
 
-    private void addErrorTransactions(Account failedAccount) {
-        String error = "Account " + failedAccount.getIban()
-                        + " has insufficient funds for a split payment.";
+    private Transaction getSuccessfullTransaction() {
+        Transaction.Builder builder = new Transaction.Builder().timestamp(command.getTimestamp())
+                                        .custom("description", "Split payment of "
+                                                + String.format("%.2f", command.getAmount())
+                                                + " " + command.getCurrency())
+                                        .custom("splitPaymentType", type)
+                                        .custom("currency", command.getCurrency())
+                                        .involvedAccounts(command.getAccounts());
 
+        if (type.equals("equal")) {
+            builder.amount(amountForUsers.getFirst());
+        } else {
+            builder.amountForUsers(command.getAmountForUsers());
+        }
+
+        return builder.build();
+    }
+
+    private void addErrorTransactions(final String error) {
         for (String s : command.getAccounts()) {
             Account account = getBankManager().getAccount(s);
             User user = getBankManager().getUserByAccount(account);
@@ -135,18 +161,6 @@ public final class SplitPayment {
             Transaction transaction = getErrorTransaction(error, type);
             user.addTransaction(transaction);
         }
-    }
-
-    private Transaction getSuccessfullTransaction() {
-        return new Transaction.Builder().timestamp(command.getTimestamp())
-                                        .custom("description", "Split payment of "
-                                                + String.format("%.2f", command.getAmount())
-                                                + " " + command.getCurrency())
-                                        .custom("splitPaymentType", type)
-                                        .custom("currency", command.getCurrency())
-                                        .amountForUsers(command.getAmountForUsers())
-                                        .involvedAccounts(command.getAccounts())
-                                        .build();
     }
 
     private Transaction getErrorTransaction(final String error, final String type) {

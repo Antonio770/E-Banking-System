@@ -21,6 +21,18 @@ public final class CommandInvoker {
         for (CommandInput commandInput : input.getCommands()) {
             Command command = commandFactory.create(commandInput);
 
+            if (commandInput.getAccount() != null && commandInput.getAccount().equals("RO90POOB5450777208072365")) {
+                System.out.println();
+            }
+
+            if (commandInput.getCardNumber() != null && commandInput.getCardNumber().equals("9281102140265301")) {
+                System.out.println();
+            }
+
+            if (commandInput.getTimestamp() == 563) {
+                System.out.println();
+            }
+
             try {
                 ObjectNode objectNode = command.execute();
                 if (objectNode != null) {

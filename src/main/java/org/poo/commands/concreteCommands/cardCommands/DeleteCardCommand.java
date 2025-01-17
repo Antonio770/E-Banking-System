@@ -15,15 +15,16 @@ public final class DeleteCardCommand extends Command {
 
     @Override
     public ObjectNode execute() {
-        try {
             Card card = getBankManager().getCardByNumber(getInput().getCardNumber());
-            User user = getBankManager().getUserByCard(card);
+            Account account = getBankManager().getAccountOfCard(card);
+            User user = getBankManager().getUserByEmail(getInput().getEmail());
 
+            // TODO: employees can only delete cards created by them
+
+        try {
             // If the user is valid, destroy the card and add a transaction
             // to the user's and account's list of transactions
-            if (user != null) {
-                Account account = user.getAccountOfCard(card);
-
+            if (account.getBalance() == 0  && user.hasCard(card)) {
                 Transaction transaction = new Transaction.Builder()
                                               .timestamp(getInput().getTimestamp())
                                               .custom("description", "The card has been destroyed")
@@ -34,9 +35,8 @@ public final class DeleteCardCommand extends Command {
 
                 user.addTransaction(transaction);
                 account.addTransaction(transaction);
+                getBankManager().removeCard(card);
             }
-
-            getBankManager().removeCard(card);
 
         } catch (NullPointerException e) {
             return null;

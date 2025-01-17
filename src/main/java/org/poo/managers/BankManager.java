@@ -14,6 +14,7 @@ import org.poo.user.User;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -105,9 +106,20 @@ public final class BankManager {
      * @return the user found, or null if there is no user with the given account
      */
     public User getUserByAccount(final Account account) {
-        for (User user : this.users) {
+        for (User user : users) {
             if (user.getAccounts().contains(account)) {
                 return user;
+            }
+        }
+
+        return null;
+    }
+
+    public Account getAccountOfCard(final Card card) {
+        for (User user : users) {
+            Account account = user.getAccountOfCard(card);
+            if (account != null) {
+                return account;
             }
         }
 
@@ -120,7 +132,7 @@ public final class BankManager {
      * @return the account, or null if not found
      */
     public Account getAccount(final String acc) {
-        for (User user : this.users) {
+        for (User user : users) {
             Map<String, String> map = user.getAliasMap();
 
             for (Account account : user.getAccounts()) {
@@ -145,7 +157,7 @@ public final class BankManager {
      * @return true if the account could be deleted, false otherwise
      */
     public boolean removeAccount(final String acc) {
-        for (User user : this.users) {
+        for (User user : users) {
             Map<String, String> map = user.getAliasMap();
 
             for (Account account : user.getAccounts()) {
@@ -174,7 +186,7 @@ public final class BankManager {
      * @return the card, or null if not found
      */
     public Card getCardByNumber(final String cardNumber) {
-        for (User user : this.users) {
+        for (User user : users) {
             for (Account account : user.getAccounts()) {
                 for (Card card : account.getCards()) {
                     if (card.getCardNumber().equals(cardNumber)) {
@@ -192,7 +204,7 @@ public final class BankManager {
      * @param card the card to be removed
      */
     public void removeCard(final Card card) {
-        for (User user : this.users) {
+        for (User user : users) {
             for (Account account : user.getAccounts()) {
                 if (account.getCards().contains(card)) {
                     account.removeCard(card);
@@ -203,7 +215,7 @@ public final class BankManager {
     }
 
     public Commerciant getCommerciantByName(final String name) {
-        for (Commerciant comm : this.commerciants) {
+        for (Commerciant comm : commerciants) {
             if (comm.getName().equals(name)) {
                 return comm;
             }
@@ -213,7 +225,7 @@ public final class BankManager {
     }
 
     public Commerciant getCommerciantByIban(final String iban) {
-        for (Commerciant comm : this.commerciants) {
+        for (Commerciant comm : commerciants) {
             if (comm.getAccount().equals(iban)) {
                 return comm;
             }
@@ -223,9 +235,15 @@ public final class BankManager {
     }
 
     public SplitPayment getSplitPaymentOfUser(final User user, final String type) {
-        for (SplitPayment sp : this.splitPayments) {
+        // TODO: make this look better
+
+        for (SplitPayment sp : splitPayments) {
             if (sp.getType().equals(type) && sp.getUsers().contains(user)) {
-                return sp;
+                for (Account account : sp.getPendingAccounts()) {
+                    if (user.getAccounts().contains(account)) {
+                        return sp;
+                    }
+                }
             }
         }
 

@@ -4,6 +4,7 @@ import org.poo.commands.concreteCommands.accountCommands.*;
 import org.poo.commands.concreteCommands.businessCommands.AddAssociateCommand;
 import org.poo.commands.concreteCommands.businessCommands.BusinessReportCommand;
 import org.poo.commands.concreteCommands.businessCommands.ChangeLimitCommand;
+import org.poo.commands.concreteCommands.cardCommands.CashWithdrawalCommand;
 import org.poo.commands.concreteCommands.cardCommands.CheckCardStatusCommand;
 import org.poo.commands.concreteCommands.cardCommands.CreateCardCommand;
 import org.poo.commands.concreteCommands.cardCommands.DeleteCardCommand;

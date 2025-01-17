@@ -31,7 +31,7 @@ public final class BusinessUserStats {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
 
-        node.put("username", user.getFirstName() + " " + user.getLastName());
+        node.put("username", user.getLastName() + " " + user.getFirstName());
         node.put("spent", spent);
         node.put("deposited", deposited);
 

@@ -27,7 +27,7 @@ import java.util.Map;
 @Getter
 @Setter
 @JsonIgnoreProperties({"transactions", "paymentStrategy", "aliasMap", "plan",
-                        "birthDate", "occupation", "age"})
+                        "birthDate", "occupation", "age", "upgradeTransactions"})
 public final class User {
     private String firstName;
     private String lastName;
@@ -37,6 +37,7 @@ public final class User {
 
     private ArrayList<Account> accounts;
     private Plan plan;
+    private int upgradeTransactions;
 
     private ArrayList<Transaction> transactions;
     private PaymentStrategy paymentStrategy;
@@ -51,6 +52,7 @@ public final class User {
         this.accounts = new ArrayList<Account>();
         this.transactions = new ArrayList<Transaction>();
         this.aliasMap = new HashMap<String, String>();
+        this.upgradeTransactions = 0;
 
         if (this.occupation.equals("student")) {
             this.plan = new StudentPlan();
@@ -80,6 +82,12 @@ public final class User {
 
     public void sortTransactionsByTimestamp() {
         transactions.sort(Comparator.comparingInt(Transaction::getTimestamp));
+    }
+
+    public void incrementUpgradeTransactions() {
+        // TODO: for business accounts, only increment the transactions made
+        //  if they were made by the owner
+        this.upgradeTransactions++;
     }
 
     /**
@@ -152,9 +160,10 @@ public final class User {
     }
 
     @JsonIgnore
-    public Account getFirstClassicAccount() {
+    public Account getFirstClassicAccount(final String currency) {
         for (Account account : accounts) {
-            if (account != null && account.getType().equals("classic")) {
+            if (account != null && account.getType().equals("classic")
+                && account.getCurrency().equals(currency)) {
                 return account;
             }
         }

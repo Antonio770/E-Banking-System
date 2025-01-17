@@ -16,17 +16,30 @@ public final class UpgradePlanCommand extends Command {
     @Override
     public ObjectNode execute() {
         Account account = getBankManager().getAccount(getInput().getAccount());
-        User user = getBankManager().getUserByAccount(account);
 
-        if (user == null || account == null) {
-            System.out.println("Account not found");
+        if (account == null) {
+            return getErrorNode("Account not found");
         }
+
+        User user = account.ownerOfAccount();
 
         String newPlan = getInput().getNewPlanType();
         double upgradePrice = user.getPlan().getUpgradePrice(newPlan);
 
+        if (user.getPlan().getType().equals(newPlan)) {
+            Transaction transaction = new Transaction.Builder()
+                    .timestamp(getInput().getTimestamp())
+                    .custom("description", "The user already has the " + newPlan + " plan.")
+                    .build();
+
+            user.addTransaction(transaction);
+            account.addTransaction(transaction);
+            return null;
+        }
+
+        // You cannot downgrade your plan
         if (upgradePrice == -1) {
-            System.out.println("You cannot downgrade your plan");
+            return null;
         }
 
         ExchangeManager exchangeManager = ExchangeManager.getInstance();
@@ -44,7 +57,14 @@ public final class UpgradePlanCommand extends Command {
                                     .build();
 
             user.addTransaction(transaction);
+            account.addTransaction(transaction);
+            return null;
         }
+
+        user.addTransaction(new Transaction.Builder()
+                            .timestamp(getInput().getTimestamp())
+                            .custom("description", "Insufficient funds")
+                            .build());
 
         return null;
     }

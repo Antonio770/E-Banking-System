@@ -8,17 +8,18 @@ import org.poo.accounts.Account;
 import org.poo.cards.Card;
 import org.poo.fileio.CommandInput;
 import org.poo.managers.BankManager;
+import org.poo.managers.ExchangeManager;
 import org.poo.user.User;
 import org.poo.visitors.Visitor;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
-@JsonIgnoreProperties({"users", "roles", "cardOwners", "spendingLimit", "depositLimit"})
+@JsonIgnoreProperties({"users", "roles", "cardOwners", "spendingLimit", "depositLimit",
+                       "transactions", "minBalance", "WARNING_BALANCE", "discounts",
+                       "transactionsMade", "totalSpent"})
 public final class BusinessAccount extends Account {
     private ArrayList<User> users;
     private HashMap<User, BusinessRoles> roles;
@@ -36,11 +37,14 @@ public final class BusinessAccount extends Account {
 
         // The user that creates the account is the owner
         BankManager bankManager = BankManager.getInstance();
-        User user = bankManager.getUserByEmail(input.getEmail());
-        roles.put(user, BusinessRoles.OWNER);
+        User owner = bankManager.getUserByEmail(input.getEmail());
+        users.add(owner);
+        roles.put(owner, BusinessRoles.OWNER);
 
-        this.spendingLimit = INITIAL_LIMIT;
-        this.depositLimit = INITIAL_LIMIT;
+        ExchangeManager exchangeManager = ExchangeManager.getInstance();
+        double convertedLimit = exchangeManager.getAmount("RON", getCurrency(), INITIAL_LIMIT);
+        this.spendingLimit = convertedLimit;
+        this.depositLimit = convertedLimit;
     }
 
     @Override
@@ -48,55 +52,25 @@ public final class BusinessAccount extends Account {
         return visitor.visit(this);
     }
 
-    public BusinessRoles getRole(User user) {
-        return roles.get(user);
-    }
-
-    @JsonIgnore
-    public User getOwner(Card card) {
-        return cardOwners.get(card);
-    }
-
-    @JsonIgnore
-    private ArrayList<User> getManagers() {
-        return users.stream()
-                .filter(user -> roles.get(user) == BusinessRoles.MANAGER)
-                .sorted(Comparator.comparing(User::getFirstName)
-                        .thenComparing(User::getLastName))
-                .collect(Collectors.toCollection(ArrayList::new));
-    }
-
-    @JsonIgnore
-    private ArrayList<User> getEmployees() {
-        return users.stream()
-                .filter(user -> roles.get(user) == BusinessRoles.EMPLOYEE)
-                .sorted(Comparator.comparing(User::getFirstName)
-                        .thenComparing(User::getLastName))
-                .collect(Collectors.toCollection(ArrayList::new));
-    }
-
-    @JsonIgnore
-    public ArrayList<User> getAllUsersSorted() {
-        // Get the lists of managers and employees
-        ArrayList<User> managers = getManagers();
-        ArrayList<User> employees = getEmployees();
-
-        // Sort the managers and employees alphabetically
-        managers.sort(Comparator.comparing(User::getLastName).thenComparing(User::getFirstName));
-        employees.sort(Comparator.comparing(User::getLastName).thenComparing(User::getFirstName));
-
-        // Concatenate the 2 lists to get a list of all users sorted by role and then by name
-        ArrayList<User> users = new ArrayList<>(managers);
-        users.addAll(employees);
-
-        return users;
-    }
-
     public void addAssociate(User user, String role) {
         users.add(user);
         roles.put(user, getRoleFromString(role));
     }
 
+    public BusinessRoles getRole(User user) {
+        return roles.get(user);
+    }
+
+    @Override
+    public User ownerOfAccount() {
+        for (User user : users) {
+            if (roles.get(user) == BusinessRoles.OWNER) {
+                return user;
+            }
+        }
+
+        return null;
+    }
 
     @JsonIgnore
     private BusinessRoles getRoleFromString(String role) {

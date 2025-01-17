@@ -68,8 +68,8 @@ public final class ExchangeManager {
             // To go return to the initial currency, add the reverse edge
             // with an inverse cost
             this.exchangeRates.add(new ExchangeRate(from, to, rate));
-            this.exchangeRates.add(new ExchangeRate(to, from,
-                                                    Math.ceil(1.00 / rate * ERROR) / ERROR));
+            this.exchangeRates.add(new ExchangeRate(to, from, 1.00 / rate));
+//                                                    Math.ceil(1.00 / rate * ERROR) / ERROR));
 
             // Adds the currencies to the list of currencies if
             // it doesn't already contain them

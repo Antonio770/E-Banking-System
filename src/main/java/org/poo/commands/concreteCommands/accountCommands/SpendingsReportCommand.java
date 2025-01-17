@@ -8,8 +8,10 @@ import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
 import org.poo.transaction.Transaction;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public final class SpendingsReportCommand extends Command {
     public SpendingsReportCommand(final CommandInput input) {
@@ -61,23 +63,26 @@ public final class SpendingsReportCommand extends Command {
         // Create a TreeMap to store the commerciants in alphabetical order
         Map<String, Double> commerciants = new TreeMap<String, Double>();
 
-        // For every transaction in the account's list, check if it happened
-        // in the specified interval and if it's of type "Card payment".
-        for (Transaction transaction : account.getTransactions()) {
-            if (transaction.getTimestamp() >= getInput().getStartTimestamp()
-                && transaction.getTimestamp() <= getInput().getEndTimestamp()
-                && transaction.getStringMap().get("description").equals("Card payment")) {
+        // Filter the transactions to only contain the ones that happened
+        // in the specified interval and are of type "Card payment"
+        int start = getInput().getStartTimestamp();
+        int end = getInput().getEndTimestamp();
+        ArrayList<Transaction> transactions = getTransactionsInInterval(account, start, end);
 
-                transactionsNode.add(transaction.getObjectNode());
-                String commerciant = transaction.getStringMap().get("commerciant");
-                double amount = transaction.getAmount();
-
-                // If the commerciant is not in the TreeMap, add it.
-                // If it's already in the TreeMap, update the total money sent
-                // to that commerciant
-                double total = commerciants.getOrDefault(commerciant, 0.0);
-                commerciants.put(commerciant, total + amount);
+        for (Transaction transaction : transactions) {
+            // Don't add the "AddFunds" command to the transactions output
+            if (transaction.getStringMap().get("description").equals("Added funds")) {
+                continue;
             }
+
+            transactionsNode.add(transaction.getObjectNode());
+            String commerciant = transaction.getStringMap().get("commerciant");
+            double amount = transaction.getAmount();
+
+            // If the commerciant is not in the TreeMap, add it.
+            // If it's already in the TreeMap, update the total money sent to that commerciant
+            double total = commerciants.getOrDefault(commerciant, 0.0);
+            commerciants.put(commerciant, total + amount);
         }
 
         // For every commerciant, add the name and
@@ -96,5 +101,14 @@ public final class SpendingsReportCommand extends Command {
         returnNode.put("timestamp", getInput().getTimestamp());
 
         return returnNode;
+    }
+
+    private ArrayList<Transaction> getTransactionsInInterval(final Account account,
+                                                             final int start, final int end) {
+        return account.getTransactions().stream()
+                .filter(transaction -> transaction.getTimestamp() >= start)
+                .filter(transaction -> transaction.getTimestamp() <= end)
+                .filter(tr -> tr.getStringMap().get("description").equals("Card payment"))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 }

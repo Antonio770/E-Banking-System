@@ -41,7 +41,7 @@ public final class CheckCardStatusCommand extends Command {
 
         // Checks and updates the status of the card
         User user = getBankManager().getUserByCard(card);
-        Account account = user.getAccountOfCard(card);
+        Account account = getBankManager().getAccountOfCard(card);
 
         account.updateStatus(card);
         String status = card.getStatus();

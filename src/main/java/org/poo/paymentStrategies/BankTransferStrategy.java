@@ -3,6 +3,8 @@ package org.poo.paymentStrategies;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
+import org.poo.accounts.business.BusinessAccount;
+import org.poo.accounts.business.BusinessRoles;
 import org.poo.commerciant.Commerciant;
 import org.poo.managers.BankManager;
 import org.poo.managers.ExchangeManager;
@@ -29,18 +31,25 @@ public final class BankTransferStrategy implements PaymentStrategy {
         try {
             Account sender = bankManager.getAccount(input.getAccount());
             Account receiver = bankManager.getAccount(input.getReceiver());
-            User senderUser = bankManager.getUserByAccount(sender);
+            User senderUser = sender.ownerOfAccount();
             Commerciant commerciant = bankManager.getCommerciantByIban(input.getReceiver());
 
             double totalSenderAmount = senderUser.getPlan().addFee(input.getAmount(),
                                                                    sender.getCurrency());
-            double conversionRate = exchangeManager.getConversionRate(sender.getCurrency(),
-                                                                      receiver.getCurrency());
-            double receiverAmount = input.getAmount() * conversionRate;
 
             // The sender cannot be an alias
             if (!sender.getIban().equals(input.getAccount())) {
                 return false;
+            }
+
+            // Employees have a spending limit
+            if (sender.getType().equals("business")) {
+                BusinessAccount businessAccount = (BusinessAccount) sender;
+
+                if (totalSenderAmount > businessAccount.getSpendingLimit()
+                        && businessAccount.getRole(senderUser) == BusinessRoles.EMPLOYEE) {
+                    return false;
+                }
             }
 
             // If there is enough money in the account, pay the amount
@@ -51,7 +60,15 @@ public final class BankTransferStrategy implements PaymentStrategy {
                     commerciant.getCashbackStrategy().cashback(sender, input.getAmount(),
                                                                commerciant);
                 } else {
+                    double conversionRate = exchangeManager.getConversionRate(sender.getCurrency(),
+                                                                           receiver.getCurrency());
+                    double receiverAmount = input.getAmount() * conversionRate;
                     receiver.addFunds(receiverAmount);
+                }
+
+                // If 5 transactions of over 300 RON were made, upgrade from silver to gold
+                if (sender.checkUpgradeTransaction(input.getAmount())) {
+                    senderUser.addTransaction(getUpgradePlanTransaction(input, sender));
                 }
 
                 return true;
@@ -71,5 +88,15 @@ public final class BankTransferStrategy implements PaymentStrategy {
         } catch (NullPointerException e) {
             return false;
         }
+    }
+
+    private Transaction getUpgradePlanTransaction(final CommandInput input,
+                                                  final Account account) {
+        return new Transaction.Builder()
+                .timestamp(input.getTimestamp())
+                .custom("description", "Upgrade plan")
+                .custom("accountIBAN", account.getIban())
+                .custom("newPlanType", "gold")
+                .build();
     }
 }

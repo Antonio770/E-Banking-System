@@ -21,7 +21,7 @@ public final class CreateCardCommand extends Command {
 
             // If the user is not the owner of the account,
             // he cannot create a card
-            if (!user.hasAccount(account)) {
+            if (account == null || !user.hasAccount(account)) {
                 return null;
             }
 

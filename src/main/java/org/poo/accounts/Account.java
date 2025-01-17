@@ -8,7 +8,9 @@ import lombok.Setter;
 
 import org.poo.cards.Card;
 import org.poo.cards.CardFactory;
+import org.poo.commerciant.Commerciant;
 import org.poo.fileio.CommandInput;
+import org.poo.managers.BankManager;
 import org.poo.managers.ExchangeManager;
 import org.poo.transaction.Transaction;
 import org.poo.user.User;
@@ -17,6 +19,7 @@ import org.poo.visitors.Visitable;
 import org.poo.visitors.Visitor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 @Getter
 @Setter
@@ -32,10 +35,10 @@ public abstract class Account implements Visitable {
 
     private ArrayList<Transaction> transactions;
     private double minBalance;
-    private static final double WARNING_BALANCE = 30;
+    private static final double UPGRADE_TRANSACTION_AMOUNT = 300;
 
-    private ArrayList<String> discounts;
-    private int transactionsMade;
+    private HashMap<String, Boolean> discounts;
+    private HashMap<Commerciant, Integer> transactionsMade;
     private double totalSpent;
 
     public Account(final CommandInput input) {
@@ -43,14 +46,13 @@ public abstract class Account implements Visitable {
         this.balance = 0;
         this.currency = input.getCurrency();
         this.type = input.getAccountType();
-        this.cards = new ArrayList<>();
-        this.transactions = new ArrayList<>();
+        this.cards = new ArrayList<Card>();
+        this.transactions = new ArrayList<Transaction>();
         this.minBalance = 0;
-        this.discounts = new ArrayList<>();
-        this.transactionsMade = 0;
+        this.discounts = new HashMap<String, Boolean>();
+        this.transactionsMade = new HashMap<Commerciant, Integer>();
         this.totalSpent = 0;
     }
-
 
     public abstract double accept(Visitor visitor);
 
@@ -68,8 +70,31 @@ public abstract class Account implements Visitable {
 
     public void addTotalSpent(final double amount) {
         this.totalSpent += amount;
+    }
 
-        // TODO: upgrade plan if a certain amount of money has been spent
+    public void addTransactionToCommerciant(final Commerciant commerciant) {
+        int current = transactionsMade.getOrDefault(commerciant, 0);
+        transactionsMade.put(commerciant, ++current);
+    }
+
+    public boolean checkUpgradeTransaction(final double amount) {
+        User user = this.ownerOfAccount();
+
+        ExchangeManager exchangeManager = ExchangeManager.getInstance();
+        double ronAmount = exchangeManager.getAmount(currency, "RON", amount);
+
+        // Only start to count the upgrade transactions if the plan is "silver"
+        if (ronAmount >= UPGRADE_TRANSACTION_AMOUNT && user != null
+            && user.getPlan().getType().equals("silver")) {
+            user.incrementUpgradeTransactions();
+
+            if (user.getUpgradeTransactions() == 5) {
+                user.setPlan(user.getPlan().upgradeTo("gold"));
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -104,8 +129,6 @@ public abstract class Account implements Visitable {
     public void updateStatus(final Card card) {
         if (balance <= minBalance) {
             card.setStatus("frozen");
-        } else if (balance - minBalance <= WARNING_BALANCE) {
-            card.setStatus("warning");
         } else {
             card.setStatus("active");
         }
@@ -121,5 +144,10 @@ public abstract class Account implements Visitable {
         ExchangeManager exchangeManager = ExchangeManager.getInstance();
         double convertedAmount = exchangeManager.getAmount(from, currency, amount);
         return this.balance >= convertedAmount;
+    }
+
+    public User ownerOfAccount() {
+        BankManager bankManager = BankManager.getInstance();
+        return bankManager.getUserByAccount(this);
     }
 }

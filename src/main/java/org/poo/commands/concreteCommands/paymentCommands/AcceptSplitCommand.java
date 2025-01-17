@@ -17,8 +17,7 @@ public final class AcceptSplitCommand extends Command {
         String type = getInput().getSplitPaymentType();
 
         if (user == null) {
-            // TODO: add error
-            return null;
+            return getErrorNode("User not found");
         }
 
         SplitPayment splitPayment = getBankManager().getSplitPaymentOfUser(user, type);

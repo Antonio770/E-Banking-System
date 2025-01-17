@@ -1,11 +1,13 @@
-package org.poo.commands.concreteCommands.accountCommands;
+package org.poo.commands.concreteCommands.cardCommands;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
+import org.poo.accounts.business.BusinessAccount;
 import org.poo.cards.Card;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
 import org.poo.managers.ExchangeManager;
+import org.poo.plans.Plan;
 import org.poo.transaction.Transaction;
 import org.poo.user.User;
 
@@ -21,19 +23,21 @@ public final class CashWithdrawalCommand extends Command {
             return getErrorNode("Card not found");
         }
 
-        User user = getBankManager().getUserByCard(card);
-        if (user == null) {
-            return getErrorNode("User not found");
-        }
-
-        Account account = user.getAccountOfCard(card);
+        Account account = getBankManager().getAccountOfCard(card);
         if (account == null) {
             return getErrorNode("Account not found");
         }
 
-        ExchangeManager exchangeManager = ExchangeManager.getInstance();
-        double feeAdded = user.getPlan().addFee(getInput().getAmount(), "RON");
-        double convertedAmount = exchangeManager.getAmount("RON", account.getCurrency(), feeAdded);
+        User user = getBankManager().getUserByEmail(getInput().getEmail());
+        if (user == null || getInput().getEmail().isEmpty()) {
+            return getErrorNode("User not found");
+        }
+
+        if (!user.hasCard(card) && !account.getType().equals("business")) {
+            return getErrorNode("Card not found");
+        }
+
+        double convertedAmount = getConvertedAmount(account);
 
         if (account.canPay(convertedAmount, account.getCurrency())) {
             account.spendFunds(convertedAmount);
@@ -45,6 +49,7 @@ public final class CashWithdrawalCommand extends Command {
                                     .amount(getInput().getAmount())
                                     .build();
             user.addTransaction(transaction);
+
             return null;
         }
 
@@ -54,5 +59,14 @@ public final class CashWithdrawalCommand extends Command {
                                 .build();
         user.addTransaction(transaction);
         return null;
+    }
+
+    private double getConvertedAmount(Account account) {
+        Plan plan = account.ownerOfAccount().getPlan();
+
+        ExchangeManager exchangeManager = ExchangeManager.getInstance();
+        double feeAdded = plan.addFee(getInput().getAmount(), "RON");
+        double convertedAmount = exchangeManager.getAmount("RON", account.getCurrency(), feeAdded);
+        return convertedAmount;
     }
 }
