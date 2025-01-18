@@ -99,7 +99,8 @@ public final class PayOnlineStrategy implements PaymentStrategy {
 
                 // If 5 transactions of over 300 RON were made, upgrade from silver to gold
                 if (account.checkUpgradeTransaction(convertedPrice)) {
-                    account.ownerOfAccount().addTransaction(getUpgradePlanTransaction(input, account));
+                    account.ownerOfAccount()
+                           .addTransaction(getUpgradePlanTransaction(input, account));
                 }
 
                 return true;

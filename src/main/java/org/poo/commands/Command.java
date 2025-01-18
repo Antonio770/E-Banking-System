@@ -25,6 +25,11 @@ public abstract class Command {
      */
     public abstract ObjectNode execute();
 
+    /**
+     * Creates an error ObjectNode containing the timestamp and description of the error
+     * @param description the description of the command that failed to execute
+     * @return the error node to be written in the output file in JSON format
+     */
     public ObjectNode getErrorNode(final String description) {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode objectNode = objectMapper.createObjectNode();
@@ -39,6 +44,12 @@ public abstract class Command {
         return objectNode;
     }
 
+    /**
+     * Creates a simple transaction only containing a timestamp and a description
+     * @param timestamp the timestamp at which the transaction took place
+     * @param description the description of the transaction
+     * @return
+     */
     public Transaction getSimpleTransaction(final int timestamp, final String description) {
         return new Transaction.Builder().timestamp(timestamp)
                                         .custom("description", description)

@@ -8,8 +8,6 @@ import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -27,6 +25,12 @@ public final class Transaction {
         private List<Double> amountForUsers = null;
         private final HashMap<String, String> stringMap = new HashMap<>();
 
+        /**
+         * Adds a custom field to the transaction
+         * @param key a string representing the key
+         * @param value a string representing the value
+         * @return the Builder instance
+         */
         public Builder custom(final String key, final String value) {
             stringMap.put(key, value);
             return this;
@@ -62,6 +66,11 @@ public final class Transaction {
             return this;
         }
 
+        /**
+         * Sets the amount of money that needs to be paid by every user in a split payment
+         * @param amounts the list of amounts
+         * @return the Builder instance
+         */
         public Builder amountForUsers(final List<Double> amounts) {
             this.amountForUsers = amounts;
             return this;
@@ -123,8 +132,8 @@ public final class Transaction {
         if (amountForUsers != null) {
             ArrayNode amountsNode = objectMapper.createArrayNode();
 
-            for (Double amount : this.amountForUsers) {
-                amountsNode.add(amount);
+            for (Double amnt : this.amountForUsers) {
+                amountsNode.add(amnt);
             }
 
             output.set("amountForUsers", amountsNode);

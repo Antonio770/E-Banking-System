@@ -9,7 +9,7 @@ import org.poo.transaction.Transaction;
 import org.poo.user.User;
 
 public final class UpgradePlanCommand extends Command {
-    public UpgradePlanCommand(CommandInput input) {
+    public UpgradePlanCommand(final CommandInput input) {
         super(input);
     }
 

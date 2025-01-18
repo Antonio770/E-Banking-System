@@ -14,17 +14,19 @@ import org.poo.fileio.CommandInput;
 import org.poo.transaction.Transaction;
 import org.poo.user.User;
 
-import java.lang.reflect.Array;
-import java.security.KeyStore;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
+import java.util.Comparator;
 
-public class BusinessReportCommand extends Command {
-    private int start;
-    private int end;
+public final class BusinessReportCommand extends Command {
+    private final int start;
+    private final int end;
 
-    public BusinessReportCommand(CommandInput input) {
+    public BusinessReportCommand(final CommandInput input) {
         super(input);
         start = getInput().getStartTimestamp();
         end = getInput().getEndTimestamp();
@@ -34,16 +36,12 @@ public class BusinessReportCommand extends Command {
     public ObjectNode execute() {
          Account account = getBankManager().getAccount(getInput().getAccount());
          String type = getInput().getType();
-         int start = getInput().getStartTimestamp();
-         int end = getInput().getEndTimestamp();
 
          if (account == null) {
-             // TODO: account not found
              return null;
          }
 
          if (!account.getType().equals("business")) {
-             // TODO: account not of type business
              return null;
          }
 
@@ -74,7 +72,8 @@ public class BusinessReportCommand extends Command {
             BusinessUserStats stats = userStats.get(user);
 
             // Online payments and sent money through bank transfers
-            if (description.equals("Card payment") || (transferType != null && transferType.equals("sent"))) {
+            if (description.equals("Card payment")
+                || (transferType != null && transferType.equals("sent"))) {
                 stats.addSpend(transaction.getAmount());
             }
 
@@ -138,7 +137,7 @@ public class BusinessReportCommand extends Command {
         return getCommerciantReportNode(account, stats);
     }
 
-    private LinkedHashMap<User, BusinessUserStats> getUserStats(ArrayList<User> users) {
+    private LinkedHashMap<User, BusinessUserStats> getUserStats(final ArrayList<User> users) {
         ArrayList<BusinessUserStats> stats = new ArrayList<>();
         LinkedHashMap<User, BusinessUserStats> userStats = new LinkedHashMap<>();
 

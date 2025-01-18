@@ -19,11 +19,11 @@ public final class StudentPlan implements Plan {
     @Override
     public double getUpgradePrice(final String newType) {
         if (newType.equals("silver")) {
-            return 100;
+            return STANDARD_TO_SILVER;
         }
 
         if (newType.equals("gold")) {
-            return 350;
+            return STANDARD_TO_GOLD;
         }
 
         return -1;

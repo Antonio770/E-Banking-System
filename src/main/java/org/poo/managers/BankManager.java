@@ -8,13 +8,12 @@ import org.poo.cards.Card;
 import org.poo.commerciant.Commerciant;
 import org.poo.fileio.CommerciantInput;
 import org.poo.fileio.UserInput;
-import org.poo.splitPayments.SplitPayment;
+import org.poo.splitPayment.SplitPayment;
 import org.poo.user.User;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -55,17 +54,15 @@ public final class BankManager {
      * @param usr The list of users
      */
     public void addUsers(final List<UserInput> usr) {
-        for (UserInput user : usr) {
-            User newUser = new User(user);
-            this.users.add(newUser);
-        }
+        usr.forEach(user -> users.add(new User(user)));
     }
 
+    /**
+     * Adds all the commerciants to the bank manager
+     * @param comm a list of the commerciants
+     */
     public void addCommerciants(final List<CommerciantInput> comm) {
-        for (CommerciantInput commerciant : comm) {
-            Commerciant newComm = new Commerciant(commerciant);
-            this.commerciants.add(newComm);
-        }
+        comm.forEach(commerciant -> commerciants.add(new Commerciant(commerciant)));
     }
 
     /**
@@ -74,13 +71,10 @@ public final class BankManager {
      * @return the user found, or null if there is no user with the given email
      */
     public User getUserByEmail(final String email) {
-        for (User user : this.users) {
-            if (user.getEmail().equals(email)) {
-                return user;
-            }
-        }
-
-        return null;
+        return users.stream()
+                    .filter(user -> user.getEmail().equals(email))
+                    .findFirst()
+                    .orElse(null);
     }
 
     /**
@@ -89,15 +83,11 @@ public final class BankManager {
      * @return the user found, or null if there is no user with the given card
      */
     public User getUserByCard(final Card card) {
-        for (User user : this.users) {
-            for (Account account : user.getAccounts()) {
-                if (account.getCards().contains(card)) {
-                    return user;
-                }
-            }
-        }
-
-        return null;
+        return users.stream()
+                    .filter(user -> user.getAccounts().stream()
+                                        .anyMatch(account -> account.getCards().contains(card)))
+                    .findFirst()
+                    .orElse(null);
     }
 
     /**
@@ -106,24 +96,23 @@ public final class BankManager {
      * @return the user found, or null if there is no user with the given account
      */
     public User getUserByAccount(final Account account) {
-        for (User user : users) {
-            if (user.getAccounts().contains(account)) {
-                return user;
-            }
-        }
-
-        return null;
+        return users.stream()
+                    .filter(user -> user.getAccounts().contains(account))
+                    .findFirst()
+                    .orElse(null);
     }
 
+    /**
+     * Searches for the account that contains the specified card in the bank's data
+     * @param card the card to be searched
+     * @return the account, or null if it doesn't exist
+     */
     public Account getAccountOfCard(final Card card) {
-        for (User user : users) {
-            Account account = user.getAccountOfCard(card);
-            if (account != null) {
-                return account;
-            }
-        }
-
-        return null;
+        return users.stream()
+                    .flatMap(user -> user.getAccounts().stream())
+                    .filter(account -> account.getCards().contains(card))
+                    .findFirst()
+                    .orElse(null);
     }
 
     /**
@@ -186,17 +175,12 @@ public final class BankManager {
      * @return the card, or null if not found
      */
     public Card getCardByNumber(final String cardNumber) {
-        for (User user : users) {
-            for (Account account : user.getAccounts()) {
-                for (Card card : account.getCards()) {
-                    if (card.getCardNumber().equals(cardNumber)) {
-                        return card;
-                    }
-                }
-            }
-        }
-
-        return null;
+        return users.stream()
+                    .flatMap(user -> user.getAccounts().stream())
+                    .flatMap(account -> account.getCards().stream())
+                    .filter(card -> card.getCardNumber().equals(cardNumber))
+                    .findFirst()
+                    .orElse(null);
     }
 
     /**
@@ -204,49 +188,49 @@ public final class BankManager {
      * @param card the card to be removed
      */
     public void removeCard(final Card card) {
-        for (User user : users) {
-            for (Account account : user.getAccounts()) {
-                if (account.getCards().contains(card)) {
-                    account.removeCard(card);
-                    return;
-                }
-            }
-        }
+        users.stream()
+             .flatMap(user -> user.getAccounts().stream())
+             .filter(account -> account.getCards().contains(card))
+             .forEach(account -> account.getCards().remove(card));
     }
 
+    /**
+     * Searches for a specific commerciant
+     * @param name the name of the commerciant
+     * @return the commerciant, or null if not found
+     */
     public Commerciant getCommerciantByName(final String name) {
-        for (Commerciant comm : commerciants) {
-            if (comm.getName().equals(name)) {
-                return comm;
-            }
-        }
-
-        return null;
+        return commerciants.stream()
+                           .filter(comm -> comm.getName().equals(name))
+                           .findFirst()
+                           .orElse(null);
     }
 
+    /**
+     * Searches for a commerciant using its IBAN
+     * @param iban the IBAN of the commerciant
+     * @return the commerciant, or null if not found
+     */
     public Commerciant getCommerciantByIban(final String iban) {
-        for (Commerciant comm : commerciants) {
-            if (comm.getAccount().equals(iban)) {
-                return comm;
-            }
-        }
-
-        return null;
+        return commerciants.stream()
+                           .filter(comm -> comm.getAccount().equals(iban))
+                           .findFirst()
+                           .orElse(null);
     }
 
+    /**
+     * Searches for the first split payment of the specified type that contains an account of user
+     * @param user the user involved in the split payment
+     * @param type the type of the split payment ("equal" or "custom")
+     * @return the split payment, or null if not found
+     */
     public SplitPayment getSplitPaymentOfUser(final User user, final String type) {
-        // TODO: make this look better
+        return splitPayments.stream()
+                .filter(sp -> sp.getType().equals(type) && sp.getUsers().contains(user))
+                .filter(sp -> sp.getPendingAccounts().stream()
+                                .anyMatch(account -> user.getAccounts().contains(account)))
+                .findFirst()
+                .orElse(null);
 
-        for (SplitPayment sp : splitPayments) {
-            if (sp.getType().equals(type) && sp.getUsers().contains(user)) {
-                for (Account account : sp.getPendingAccounts()) {
-                    if (user.getAccounts().contains(account)) {
-                        return sp;
-                    }
-                }
-            }
-        }
-
-        return null;
     }
 }

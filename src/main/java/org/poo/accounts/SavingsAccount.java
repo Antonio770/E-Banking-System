@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.fileio.CommandInput;
-import org.poo.user.User;
 import org.poo.visitors.Visitable;
 import org.poo.visitors.Visitor;
 

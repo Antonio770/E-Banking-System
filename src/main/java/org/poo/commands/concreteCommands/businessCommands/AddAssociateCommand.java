@@ -7,8 +7,8 @@ import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
 import org.poo.user.User;
 
-public class AddAssociateCommand extends Command {
-    public AddAssociateCommand(CommandInput input) {
+public final class AddAssociateCommand extends Command {
+    public AddAssociateCommand(final CommandInput input) {
         super(input);
     }
 
@@ -22,7 +22,6 @@ public class AddAssociateCommand extends Command {
             BusinessAccount businessAccount = (BusinessAccount) account;
 
             if (businessAccount.getUsers().contains(user)) {
-                // TODO: The user is already an associate of the account.
                 return null;
             }
 

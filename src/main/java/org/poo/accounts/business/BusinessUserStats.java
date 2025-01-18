@@ -19,14 +19,25 @@ public final class BusinessUserStats {
         this.deposited = 0;
     }
 
+    /**
+     * Adds an amount of money to the total amount spent by this user
+     * @param amount the amount of money spent in the current transaction
+     */
     public void addSpend(final double amount) {
         this.spent += amount;
     }
 
+    /**
+     * Adds an amount of money to the total amount deposited by this user
+     * @param amount the amount of money deposited in the current transaction
+     */
     public void addDeposited(final double amount) {
         this.deposited += amount;
     }
 
+    /**
+     * @return the object node to be written in the output file in json format
+     */
     public ObjectNode getObjectNode() {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();

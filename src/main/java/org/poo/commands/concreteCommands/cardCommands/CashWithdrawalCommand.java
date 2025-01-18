@@ -2,7 +2,6 @@ package org.poo.commands.concreteCommands.cardCommands;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
-import org.poo.accounts.business.BusinessAccount;
 import org.poo.cards.Card;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
@@ -12,7 +11,7 @@ import org.poo.transaction.Transaction;
 import org.poo.user.User;
 
 public final class CashWithdrawalCommand extends Command {
-    public CashWithdrawalCommand(CommandInput input) {
+    public CashWithdrawalCommand(final CommandInput input) {
         super(input);
     }
 
@@ -61,7 +60,12 @@ public final class CashWithdrawalCommand extends Command {
         return null;
     }
 
-    private double getConvertedAmount(Account account) {
+    /**
+     * Converts the amount of money to be withdrawn from RON to the account's currency
+     * @param account the account from which the money will be withdrawn
+     * @return the converted amount
+     */
+    private double getConvertedAmount(final Account account) {
         Plan plan = account.ownerOfAccount().getPlan();
 
         ExchangeManager exchangeManager = ExchangeManager.getInstance();

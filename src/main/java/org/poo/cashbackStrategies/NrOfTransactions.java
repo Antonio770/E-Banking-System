@@ -5,7 +5,7 @@ import org.poo.commerciant.Commerciant;
 
 public final class NrOfTransactions implements CashbackStrategy {
     @Override
-    public double cashback(final Account account, final double amount,
+    public void cashback(final Account account, final double amount,
                          final Commerciant commerciant) {
         boolean isDiscountUsed = account.getDiscounts().getOrDefault(commerciant.getType(), true);
             double totalCashback = 0;
@@ -14,13 +14,13 @@ public final class NrOfTransactions implements CashbackStrategy {
 
             switch (commerciant.getType()) {
                 case "Food":
-                    totalCashback = amount * 0.02;
+                    totalCashback = amount * TWO_PERCENT;
                     break;
                 case "Clothes":
-                    totalCashback = amount * 0.05;
+                    totalCashback = amount * FIVE_PERCENT;
                     break;
                 case "Tech":
-                    totalCashback = amount * 0.10;
+                    totalCashback = amount * TEN_PERCENT;
                     break;
                 default:
                     break;
@@ -36,19 +36,17 @@ public final class NrOfTransactions implements CashbackStrategy {
 
         // Check if the account should get a cashback
         switch (account.getTransactionsMade().get(commerciant)) {
-            case 2:
+            case TWO_TRANSACTION_MADE:
                 account.getDiscounts().putIfAbsent("Food", false);
                 break;
-            case 5:
+            case FIVE_TRANSACTION_MADE:
                 account.getDiscounts().putIfAbsent("Clothes", false);
                 break;
-            case 10:
+            case TEN_TRANSACTION_MADE:
                 account.getDiscounts().putIfAbsent("Tech", false);
                 break;
             default:
                 break;
         }
-
-        return totalCashback;
     }
 }

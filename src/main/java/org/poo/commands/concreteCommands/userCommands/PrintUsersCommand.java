@@ -20,6 +20,7 @@ public final class PrintUsersCommand extends Command {
         objectNode.put("command", getInput().getCommand());
 
         ArrayList<User> users = getBankManager().getUsers();
+        users.forEach(User::roundBalances);
         objectNode.set("output", objectMapper.valueToTree(users));
 
         objectNode.put("timestamp", getInput().getTimestamp());

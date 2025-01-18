@@ -8,8 +8,8 @@ import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
 import org.poo.user.User;
 
-public class ChangeLimitCommand extends Command {
-    public ChangeLimitCommand(CommandInput input) {
+public final class ChangeLimitCommand extends Command {
+    public ChangeLimitCommand(final CommandInput input) {
         super(input);
     }
 

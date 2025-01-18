@@ -1,6 +1,14 @@
 package org.poo.commands;
 
-import org.poo.commands.concreteCommands.accountCommands.*;
+import org.poo.commands.concreteCommands.accountCommands.AddAccountCommand;
+import org.poo.commands.concreteCommands.accountCommands.AddFundsCommand;
+import org.poo.commands.concreteCommands.accountCommands.AddInterestCommand;
+import org.poo.commands.concreteCommands.accountCommands.ChangeInterestRateCommand;
+import org.poo.commands.concreteCommands.accountCommands.DeleteAccountCommand;
+import org.poo.commands.concreteCommands.accountCommands.SetAliasCommand;
+import org.poo.commands.concreteCommands.accountCommands.SetMinBalanceCommand;
+import org.poo.commands.concreteCommands.accountCommands.SpendingsReportCommand;
+import org.poo.commands.concreteCommands.accountCommands.WithdrawSavingsCommand;
 import org.poo.commands.concreteCommands.businessCommands.AddAssociateCommand;
 import org.poo.commands.concreteCommands.businessCommands.BusinessReportCommand;
 import org.poo.commands.concreteCommands.businessCommands.ChangeLimitCommand;
@@ -8,8 +16,16 @@ import org.poo.commands.concreteCommands.cardCommands.CashWithdrawalCommand;
 import org.poo.commands.concreteCommands.cardCommands.CheckCardStatusCommand;
 import org.poo.commands.concreteCommands.cardCommands.CreateCardCommand;
 import org.poo.commands.concreteCommands.cardCommands.DeleteCardCommand;
-import org.poo.commands.concreteCommands.paymentCommands.*;
-import org.poo.commands.concreteCommands.userCommands.*;
+import org.poo.commands.concreteCommands.paymentCommands.AcceptSplitCommand;
+import org.poo.commands.concreteCommands.paymentCommands.PayOnlineCommand;
+import org.poo.commands.concreteCommands.paymentCommands.RejectSplitCommand;
+import org.poo.commands.concreteCommands.paymentCommands.SendMoneyCommand;
+import org.poo.commands.concreteCommands.paymentCommands.SplitPaymentCommand;
+import org.poo.commands.concreteCommands.userCommands.PrintTransactions;
+import org.poo.commands.concreteCommands.userCommands.PrintUsersCommand;
+import org.poo.commands.concreteCommands.userCommands.ReportCommand;
+import org.poo.commands.concreteCommands.userCommands.UpgradePlanCommand;
+
 import org.poo.fileio.CommandInput;
 
 import java.util.HashMap;

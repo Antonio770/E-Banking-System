@@ -1,7 +1,5 @@
 package org.poo.accounts.business;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.commerciant.Commerciant;
@@ -22,11 +20,19 @@ public final class BusinessCommerciantStats {
         users = new ArrayList<>();
     }
 
-    public void addUser(User user) {
+    /**
+     * Adds a user to this commerciant's list of users
+     * @param user the user that sent money to this commerciant
+     */
+    public void addUser(final User user) {
         users.add(user);
     }
 
-    public void addTotalReceived(double totalReceived) {
-        this.totalReceived += totalReceived;
+    /**
+     * Adds an amount of money to the total amount received by this commerciant
+     * @param amount the amount of money received from the current transaction
+     */
+    public void addTotalReceived(final double amount) {
+        this.totalReceived += amount;
     }
 }

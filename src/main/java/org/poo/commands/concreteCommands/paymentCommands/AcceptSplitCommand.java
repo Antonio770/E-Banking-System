@@ -3,11 +3,11 @@ package org.poo.commands.concreteCommands.paymentCommands;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
-import org.poo.splitPayments.SplitPayment;
+import org.poo.splitPayment.SplitPayment;
 import org.poo.user.User;
 
 public final class AcceptSplitCommand extends Command {
-    public AcceptSplitCommand(CommandInput input) {
+    public AcceptSplitCommand(final CommandInput input) {
         super(input);
     }
 
@@ -22,12 +22,11 @@ public final class AcceptSplitCommand extends Command {
 
         SplitPayment splitPayment = getBankManager().getSplitPaymentOfUser(user, type);
 
-        if (splitPayment == null) {
-            // TODO: add error
+        try {
+            splitPayment.acceptSplitPayment(user);
+        } catch (NullPointerException e) {
             return null;
         }
-
-        splitPayment.acceptSplitPayment(user);
 
         return null;
     }

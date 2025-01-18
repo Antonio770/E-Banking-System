@@ -36,6 +36,7 @@ public abstract class Account implements Visitable {
     private ArrayList<Transaction> transactions;
     private double minBalance;
     private static final double UPGRADE_TRANSACTION_AMOUNT = 300;
+    private static final int TRANSACTIONS_REQUIRED = 5;
 
     private HashMap<String, Boolean> discounts;
     private HashMap<Commerciant, Integer> transactionsMade;
@@ -54,6 +55,12 @@ public abstract class Account implements Visitable {
         this.totalSpent = 0;
     }
 
+    /**
+     * Accepts a visitor
+     * @param visitor the visitor to be accepted
+     * @return 0 if the account is not a savings account
+     * or the amount of interest if the account is a savings one
+     */
     public abstract double accept(Visitor visitor);
 
     /**
@@ -64,19 +71,36 @@ public abstract class Account implements Visitable {
         this.balance += amount;
     }
 
+    /**
+     * Subtracts money from the account
+     * @param amount the amount of money spent
+     */
     public void spendFunds(final double amount) {
         this.balance -= amount;
     }
 
+    /**
+     * Adds money to the total amount spent on "spendigsThreshold" commerciants
+     * @param amount the amount of money spent
+     */
     public void addTotalSpent(final double amount) {
         this.totalSpent += amount;
     }
 
+    /**
+     * Increments the number of transactions made to a specific commerciant
+     * @param commerciant the commerciant to which the transaction was made
+     */
     public void addTransactionToCommerciant(final Commerciant commerciant) {
         int current = transactionsMade.getOrDefault(commerciant, 0);
         transactionsMade.put(commerciant, ++current);
     }
 
+    /**
+     * Checks if a user made enough transactions to automatically upgrade from silver plan to gold
+     * @param amount the amount of money spent in the current transaction
+     * @return true if the plan was upgraded to gold, false otherwise
+     */
     public boolean checkUpgradeTransaction(final double amount) {
         User user = this.ownerOfAccount();
 
@@ -88,7 +112,7 @@ public abstract class Account implements Visitable {
             && user.getPlan().getType().equals("silver")) {
             user.incrementUpgradeTransactions();
 
-            if (user.getUpgradeTransactions() == 5) {
+            if (user.getUpgradeTransactions() == TRANSACTIONS_REQUIRED) {
                 user.setPlan(user.getPlan().upgradeTo("gold"));
                 return true;
             }
@@ -146,6 +170,9 @@ public abstract class Account implements Visitable {
         return this.balance >= convertedAmount;
     }
 
+    /**
+     * @return the owner of the account.
+     */
     public User ownerOfAccount() {
         BankManager bankManager = BankManager.getInstance();
         return bankManager.getUserByAccount(this);

@@ -68,8 +68,8 @@ public final class ExchangeManager {
             // To go return to the initial currency, add the reverse edge
             // with an inverse cost
             this.exchangeRates.add(new ExchangeRate(from, to, rate));
-            this.exchangeRates.add(new ExchangeRate(to, from, 1.00 / rate));
-//                                                    Math.ceil(1.00 / rate * ERROR) / ERROR));
+            this.exchangeRates.add(new ExchangeRate(to, from,
+                                                    Math.ceil(1.00 / rate * ERROR) / ERROR));
 
             // Adds the currencies to the list of currencies if
             // it doesn't already contain them
@@ -140,6 +140,13 @@ public final class ExchangeManager {
         return graph[currencies.indexOf(from)][currencies.indexOf(to)];
     }
 
+    /**
+     * Converts an amount of money from one currency to another
+     * @param from the initial currenct
+     * @param to the final currency
+     * @param amount the amount of money to be converted
+     * @return the converted amount
+     */
     public double getAmount(final String from, final String to, final double amount) {
         return amount * getConversionRate(from, to);
     }

@@ -39,7 +39,13 @@ public final class AddFundsCommand extends Command {
         return null;
     }
 
-    private boolean canAddFunds(Account account) {
+    /**
+     * Checks if the user can add funds to the account.
+     * @param account the account that the user wants to add money to
+     * @return true if the user is the owner of the account. In case of a business account,
+     * returns true if the associate has the right to add the specified amount of funds
+     */
+    private boolean canAddFunds(final Account account) {
         User user = getBankManager().getUserByEmail(getInput().getEmail());
 
         if (account == null) {

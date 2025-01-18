@@ -17,6 +17,8 @@ import org.poo.plans.StandardPlan;
 import org.poo.plans.StudentPlan;
 import org.poo.transaction.Transaction;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
@@ -42,6 +44,8 @@ public final class User {
     private ArrayList<Transaction> transactions;
     private PaymentStrategy paymentStrategy;
     private Map<String, String> aliasMap;
+
+    private static final int ERROR = 8;
 
     public User(final UserInput input) {
         this.firstName = input.getFirstName();
@@ -80,29 +84,18 @@ public final class User {
         this.transactions.add(transaction);
     }
 
+    /**
+     * Sorts this user's list of transactions by timestamp
+     */
     public void sortTransactionsByTimestamp() {
         transactions.sort(Comparator.comparingInt(Transaction::getTimestamp));
     }
 
-    public void incrementUpgradeTransactions() {
-        // TODO: for business accounts, only increment the transactions made
-        //  if they were made by the owner
-        this.upgradeTransactions++;
-    }
-
     /**
-     * Searches for the account that contains a card
-     * @param card the card contained by the account
-     * @return the account if it was found, null if not
+     * Increments the number of transactions done to "nrOfTransactions" type commerciants
      */
-    public Account getAccountOfCard(final Card card) {
-        for (final Account account : this.accounts) {
-            if (account.getCards().contains(card)) {
-                return account;
-            }
-        }
-
-        return null;
+    public void incrementUpgradeTransactions() {
+        this.upgradeTransactions++;
     }
 
     /**
@@ -154,20 +147,34 @@ public final class User {
      * @return the age of the user
      */
     public int getAge() {
-        LocalDate birthDate = LocalDate.parse(this.birthDate);
+        LocalDate userBirthDate = LocalDate.parse(this.birthDate);
         LocalDate now = LocalDate.now();
-        return Period.between(birthDate, now).getYears();
+        return Period.between(userBirthDate, now).getYears();
     }
 
+    /**
+     * Searches an account of type "classic" in this user's list of accounts
+     * @param currency the currency of the account
+     * @return the first classic account that uses the specified currency
+     */
     @JsonIgnore
     public Account getFirstClassicAccount(final String currency) {
-        for (Account account : accounts) {
-            if (account != null && account.getType().equals("classic")
-                && account.getCurrency().equals(currency)) {
-                return account;
-            }
-        }
+        return accounts.stream()
+                       .filter(account -> account.getType().equals("classic")
+                                           && account.getCurrency().equals(currency))
+                       .findFirst()
+                       .orElse(null);
+    }
 
-        return null;
+    /**
+     * Rounds the balances of this user's accounts using a 10^(-8) error
+     */
+    public void roundBalances() {
+        for (Account account : accounts) {
+            BigDecimal bigDecimal = BigDecimal.valueOf(account.getBalance());
+            BigDecimal roundedValue = bigDecimal.setScale(ERROR, RoundingMode.HALF_UP);
+
+            account.setBalance(roundedValue.doubleValue());
+        }
     }
 }

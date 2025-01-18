@@ -23,17 +23,15 @@ import java.util.HashMap;
 public final class BusinessAccount extends Account {
     private ArrayList<User> users;
     private HashMap<User, BusinessRoles> roles;
-    private HashMap<Card, User> cardOwners;
 
     private double spendingLimit;
     private double depositLimit;
     private static final double INITIAL_LIMIT = 500;
 
-    public BusinessAccount(CommandInput input) {
+    public BusinessAccount(final CommandInput input) {
         super(input);
         users = new ArrayList<>();
         roles = new HashMap<>();
-        cardOwners = new HashMap<>();
 
         // The user that creates the account is the owner
         BankManager bankManager = BankManager.getInstance();
@@ -52,28 +50,42 @@ public final class BusinessAccount extends Account {
         return visitor.visit(this);
     }
 
-    public void addAssociate(User user, String role) {
+    /**
+     * Adds an associate to the business account
+     * @param user the associate to be added
+     * @param role the role of the associate
+     */
+    public void addAssociate(final User user, final String role) {
         users.add(user);
         roles.put(user, getRoleFromString(role));
     }
 
-    public BusinessRoles getRole(User user) {
+    /**
+     * @param user the user that is part of the business account
+     * @return the role of the user
+     */
+    public BusinessRoles getRole(final User user) {
         return roles.get(user);
     }
 
+    /**
+     * @return the owner of the business account
+     */
     @Override
     public User ownerOfAccount() {
-        for (User user : users) {
-            if (roles.get(user) == BusinessRoles.OWNER) {
-                return user;
-            }
-        }
-
-        return null;
+        return users.stream()
+                    .filter(u -> roles.get(u) == BusinessRoles.OWNER)
+                    .findFirst()
+                    .orElse(null);
     }
 
+    /**
+     * Converts a role from a string to an enum
+     * @param role a role in string format
+     * @return the role as a BusinessRoles enum
+     */
     @JsonIgnore
-    private BusinessRoles getRoleFromString(String role) {
+    private BusinessRoles getRoleFromString(final String role) {
         return switch (role) {
             case "owner" -> BusinessRoles.OWNER;
             case "manager" -> BusinessRoles.MANAGER;

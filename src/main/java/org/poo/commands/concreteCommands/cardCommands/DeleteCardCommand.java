@@ -19,8 +19,6 @@ public final class DeleteCardCommand extends Command {
             Account account = getBankManager().getAccountOfCard(card);
             User user = getBankManager().getUserByEmail(getInput().getEmail());
 
-            // TODO: employees can only delete cards created by them
-
         try {
             // If the user is valid, destroy the card and add a transaction
             // to the user's and account's list of transactions

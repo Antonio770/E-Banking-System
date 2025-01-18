@@ -8,7 +8,7 @@ import lombok.Setter;
 public final class StandardPlan implements Plan {
     @Override
     public double addFee(final double amount, final String currency) {
-        return amount + amount * 0.002;
+        return amount + amount * STANDARD_FEE;
     }
 
     @Override
@@ -19,11 +19,11 @@ public final class StandardPlan implements Plan {
     @Override
     public double getUpgradePrice(final String newType) {
         if (newType.equals("silver")) {
-            return 100;
+            return STANDARD_TO_SILVER;
         }
 
         if (newType.equals("gold")) {
-            return 350;
+            return STANDARD_TO_GOLD;
         }
 
         return -1;

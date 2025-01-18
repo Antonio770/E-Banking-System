@@ -26,8 +26,8 @@ public final class ChangeInterestRateCommand extends Command {
 
         Transaction transaction = new Transaction.Builder()
                                       .timestamp(getInput().getTimestamp())
-                                      .custom("description", "Interest rate of the account " +
-                                              "changed to " + getInput().getInterestRate())
+                                      .custom("description", "Interest rate of the account "
+                                              + "changed to " + getInput().getInterestRate())
                                       .build();
 
         User user = getBankManager().getUserByAccount(account);

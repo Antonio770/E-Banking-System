@@ -40,7 +40,8 @@ public final class SendMoneyCommand extends Command {
                 senderUser.addTransaction(senderTransaction);
                 senderAccount.addTransaction(senderTransaction);
 
-                // If the receiver is not a commerciant, also add a transaction in the receiver's account
+                // If the receiver is not a commerciant,
+                // also add a transaction in the receiver's account
                 if (!receiverIsComm) {
                     Transaction receiverTransaction = getTransaction(senderAccount.getCurrency(),
                             receiverAccount.getCurrency(),
@@ -69,8 +70,7 @@ public final class SendMoneyCommand extends Command {
     private Transaction getTransaction(final String from, final String to,
                                        final String transactionType) {
         ExchangeManager exchangeManager = ExchangeManager.getInstance();
-        double conversionRate = exchangeManager.getConversionRate(from, to);
-        double convertedAmount = conversionRate * getInput().getAmount();
+        double convertedAmount = exchangeManager.getAmount(from, to, getInput().getAmount());
 
         return new Transaction.Builder()
                               .timestamp(getInput().getTimestamp())

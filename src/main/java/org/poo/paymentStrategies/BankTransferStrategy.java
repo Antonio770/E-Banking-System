@@ -1,7 +1,5 @@
 package org.poo.paymentStrategies;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
 import org.poo.accounts.business.BusinessAccount;
 import org.poo.accounts.business.BusinessRoles;
@@ -60,9 +58,9 @@ public final class BankTransferStrategy implements PaymentStrategy {
                     commerciant.getCashbackStrategy().cashback(sender, input.getAmount(),
                                                                commerciant);
                 } else {
-                    double conversionRate = exchangeManager.getConversionRate(sender.getCurrency(),
-                                                                           receiver.getCurrency());
-                    double receiverAmount = input.getAmount() * conversionRate;
+                    double receiverAmount = exchangeManager.getAmount(sender.getCurrency(),
+                                                                      receiver.getCurrency(),
+                                                                      input.getAmount());
                     receiver.addFunds(receiverAmount);
                 }
 
@@ -90,6 +88,12 @@ public final class BankTransferStrategy implements PaymentStrategy {
         }
     }
 
+    /**
+     * Creates a transaction that contains information about the upgraded user plan
+     * @param input the command input
+     * @param account the account that made the transaction
+     * @return the upgrade plan transaction
+     */
     private Transaction getUpgradePlanTransaction(final CommandInput input,
                                                   final Account account) {
         return new Transaction.Builder()

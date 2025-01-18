@@ -39,7 +39,7 @@ public final class PayOnlineCommand extends Command {
             }
 
         } catch (NullPointerException e) {
-            System.out.println(e.getMessage());
+            return getErrorNode("Card not found");
         }
 
         return getErrorNode("Card not found");

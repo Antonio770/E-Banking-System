@@ -5,9 +5,29 @@ import org.poo.commerciant.Commerciant;
 import org.poo.managers.ExchangeManager;
 import org.poo.user.User;
 
+import java.util.ArrayList;
+
 public final class SpendingThreshold implements CashbackStrategy {
+    private final ArrayList<Double> firstThresholdCashback = new ArrayList<>();
+    private final ArrayList<Double> secondThresholdCashback = new ArrayList<>();
+    private final ArrayList<Double> thirdThresholdCashback = new ArrayList<>();
+
+    public SpendingThreshold() {
+        firstThresholdCashback.add(POINT_ONE_PERCENT);
+        firstThresholdCashback.add(POINT_THREE_PERCENT);
+        firstThresholdCashback.add(POINT_FIVE_PERCENT);
+
+        secondThresholdCashback.add(POINT_TWO_PERCENT);
+        secondThresholdCashback.add(POINT_FOUR_PERCENT);
+        secondThresholdCashback.add(POINT_FIVE_FIVE_PERCENT);
+
+        thirdThresholdCashback.add(POINT_TWO_FIVE_PERCENT);
+        thirdThresholdCashback.add(POINT_FIVE_PERCENT);
+        thirdThresholdCashback.add(POINT_SEVEN_PERCENT);
+    }
+
     @Override
-    public double cashback(final Account account, final double amount,
+    public void cashback(final Account account, final double amount,
                          final Commerciant commerciant) {
         User user = account.ownerOfAccount();
 
@@ -17,53 +37,12 @@ public final class SpendingThreshold implements CashbackStrategy {
 
         double totalCashback = 0;
 
-        System.out.println("totalSpent: " + account.getTotalSpent() + ", commerciant: " + commerciant.getName());
-
-        if (account.getTotalSpent() >= 500) {
-            switch (user.getPlan().getType()) {
-                case "student":
-                case "standard":
-                    totalCashback = amount * 0.0025;
-                    break;
-                case "silver":
-                    totalCashback = amount * 0.005;
-                    break;
-                case "gold":
-                    totalCashback = amount * 0.007;
-                    break;
-                default:
-                    break;
-            }
-        } else if (account.getTotalSpent() >= 300) {
-            switch (user.getPlan().getType()) {
-                case "student":
-                case "standard":
-                    totalCashback = amount * 0.002;
-                    break;
-                case "silver":
-                    totalCashback = amount * 0.004;
-                    break;
-                case "gold":
-                    totalCashback = amount * 0.0055;
-                    break;
-                default:
-                    break;
-            }
-        } else if (account.getTotalSpent() >= 100) {
-            switch (user.getPlan().getType()) {
-                case "student":
-                case "standard":
-                    totalCashback = amount * 0.001;
-                    break;
-                case "silver":
-                    totalCashback = amount * 0.003;
-                    break;
-                case "gold":
-                    totalCashback = amount * 0.005;
-                    break;
-                default:
-                    break;
-            }
+        if (account.getTotalSpent() >= THIRD_THRESHOLD) {
+            totalCashback = getTotalCashback(amount, user, thirdThresholdCashback);
+        } else if (account.getTotalSpent() >= SECOND_THRESHOLD) {
+            totalCashback = getTotalCashback(amount, user, secondThresholdCashback);
+        } else if (account.getTotalSpent() >= FIRST_THRESHOLD) {
+            totalCashback = getTotalCashback(amount, user, firstThresholdCashback);
         }
 
         boolean isDiscountUsed = account.getDiscounts().getOrDefault(commerciant.getType(), true);
@@ -71,13 +50,13 @@ public final class SpendingThreshold implements CashbackStrategy {
         if (!isDiscountUsed) {
             switch (commerciant.getType()) {
                 case "Food":
-                    totalCashback += amount * 0.02;
+                    totalCashback += amount * TWO_PERCENT;
                     break;
                 case "Clothes":
-                    totalCashback += amount * 0.05;
+                    totalCashback += amount * FIVE_PERCENT;
                     break;
                 case "Tech":
-                    totalCashback += amount * 0.10;
+                    totalCashback += amount * TEN_PERCENT;
                     break;
                 default:
                     break;
@@ -87,8 +66,16 @@ public final class SpendingThreshold implements CashbackStrategy {
             account.getDiscounts().put(commerciant.getType(), true);
         }
 
-
         account.addFunds(totalCashback);
-        return totalCashback;
+    }
+
+    private double getTotalCashback(final double amount, final User user,
+                                    final ArrayList<Double> cashback) {
+        return switch (user.getPlan().getType()) {
+            case "student", "standard" -> amount * cashback.get(0);
+            case "silver" -> amount * cashback.get(1);
+            case "gold" -> amount * cashback.get(2);
+            default -> 0;
+        };
     }
 }

@@ -3,7 +3,7 @@ package org.poo.commands.concreteCommands.paymentCommands;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
-import org.poo.splitPayments.SplitPayment;
+import org.poo.splitPayment.SplitPayment;
 
 import java.util.ArrayList;
 import java.util.Collections;

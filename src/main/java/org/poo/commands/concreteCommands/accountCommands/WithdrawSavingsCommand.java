@@ -4,12 +4,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
-import org.poo.managers.ExchangeManager;
 import org.poo.transaction.Transaction;
 import org.poo.user.User;
 
 public final class WithdrawSavingsCommand extends Command {
-    public WithdrawSavingsCommand(CommandInput input) {
+    private static final int MINIMUM_AGE = 21;
+
+    public WithdrawSavingsCommand(final CommandInput input) {
         super(input);
     }
 
@@ -22,7 +23,7 @@ public final class WithdrawSavingsCommand extends Command {
             return null;
         }
 
-        if (user.getAge() < 21) {
+        if (user.getAge() < MINIMUM_AGE) {
             Transaction transaction = getSimpleTransaction(getInput().getTimestamp(),
                             "You don't have the minimum age required.");
             user.addTransaction(transaction);

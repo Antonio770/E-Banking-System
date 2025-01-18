@@ -76,10 +76,6 @@ public final class Main {
         File file = new File(CheckerConstants.TESTS_PATH + filePath1);
         ObjectInput inputData = objectMapper.readValue(file, ObjectInput.class);
 
-        if (filePath1.equals("test18_large_input_part1.json")) {
-            System.out.println();
-        }
-
         ArrayNode output = objectMapper.createArrayNode();
 
         BankManager bankManager = BankManager.getInstance();
