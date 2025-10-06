@@ -9,7 +9,7 @@ import org.poo.accounts.business.BusinessCommerciantStats;
 import org.poo.accounts.business.BusinessRoles;
 import org.poo.accounts.business.BusinessUserStats;
 import org.poo.commands.Command;
-import org.poo.commerciant.Commerciant;
+import org.poo.merchant.Merchant;
 import org.poo.fileio.CommandInput;
 import org.poo.transaction.Transaction;
 import org.poo.user.User;
@@ -91,18 +91,18 @@ public final class BusinessReportCommand extends Command {
         ArrayList<Transaction> transactions = getTransactionsInInterval(account);
 
         // Initialize a list of commerciant stats
-        HashMap<Commerciant, BusinessCommerciantStats> stats = new HashMap<>();
+        HashMap<Merchant, BusinessCommerciantStats> stats = new HashMap<>();
 
         for (Transaction transaction : transactions) {
             String description = transaction.getStringMap().get("description");
             String transferType = transaction.getStringMap().get("transferType");
-            Commerciant commerciant = null;
+            Merchant merchant = null;
             User sender = null;
 
             // Online payments
             if (description.equals("Card payment")) {
                 String name = transaction.getStringMap().get("commerciant");
-                commerciant = getBankManager().getCommerciantByName(name);
+                merchant = getBankManager().getCommerciantByName(name);
 
                 String email = transaction.getStringMap().get("email");
                 sender = getBankManager().getUserByEmail(email);
@@ -111,7 +111,7 @@ public final class BusinessReportCommand extends Command {
             // Bank transfers
             if (transferType != null && transferType.equals("sent")) {
                 String receiver = transaction.getStringMap().get("receiverIBAN");
-                commerciant = getBankManager().getCommerciantByIban(receiver);
+                merchant = getBankManager().getCommerciantByIban(receiver);
 
                 String senderIban = transaction.getStringMap().get("senderIBAN");
                 Account acc = getBankManager().getAccount(senderIban);
@@ -119,17 +119,17 @@ public final class BusinessReportCommand extends Command {
             }
 
             // If there is no commerciant or the user was the owner, ignore the transaction
-            if (commerciant == null || account.getRole(sender) == BusinessRoles.OWNER) {
+            if (merchant == null || account.getRole(sender) == BusinessRoles.OWNER) {
                 continue;
             }
 
             // If the commerciant isn't already in the hashmap, add it
-            if (!stats.containsKey(commerciant)) {
-                stats.put(commerciant, new BusinessCommerciantStats(commerciant));
+            if (!stats.containsKey(merchant)) {
+                stats.put(merchant, new BusinessCommerciantStats(merchant));
             }
 
             // Update the stats of the commerciant
-            BusinessCommerciantStats stat = stats.get(commerciant);
+            BusinessCommerciantStats stat = stats.get(merchant);
             stat.addUser(sender);
             stat.addTotalReceived(transaction.getAmount());
         }
@@ -206,7 +206,7 @@ public final class BusinessReportCommand extends Command {
     }
 
     private ObjectNode getCommerciantReportNode(final BusinessAccount account,
-                                      final HashMap<Commerciant, BusinessCommerciantStats> stats) {
+                                      final HashMap<Merchant, BusinessCommerciantStats> stats) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode returnNode = mapper.createObjectNode();
 
@@ -223,15 +223,15 @@ public final class BusinessReportCommand extends Command {
         ArrayNode commerciantsNode = mapper.createArrayNode();
 
         // Sort the commerciants alphabetically
-        List<Map.Entry<Commerciant, BusinessCommerciantStats>> sortedStats;
+        List<Map.Entry<Merchant, BusinessCommerciantStats>> sortedStats;
 
         sortedStats = stats.entrySet().stream()
                     .sorted(Comparator.comparing(entry -> entry.getKey().getName()))
                     .toList();
 
-        for (Map.Entry<Commerciant, BusinessCommerciantStats> entry : sortedStats) {
+        for (Map.Entry<Merchant, BusinessCommerciantStats> entry : sortedStats) {
             ObjectNode commerciantNode = mapper.createObjectNode();
-            commerciantNode.put("commerciant", entry.getValue().getCommerciant().getName());
+            commerciantNode.put("commerciant", entry.getValue().getMerchant().getName());
             commerciantNode.put("total received", entry.getValue().getTotalReceived());
 
             ArrayNode employeesNode = mapper.createArrayNode();

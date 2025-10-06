@@ -5,7 +5,7 @@ import lombok.Setter;
 
 import org.poo.accounts.Account;
 import org.poo.cards.Card;
-import org.poo.commerciant.Commerciant;
+import org.poo.merchant.Merchant;
 import org.poo.fileio.CommerciantInput;
 import org.poo.fileio.UserInput;
 import org.poo.splitPayment.SplitPayment;
@@ -20,12 +20,12 @@ import java.util.Map;
 public final class BankManager {
     private static BankManager instance = null;
     private ArrayList<User> users;
-    private ArrayList<Commerciant> commerciants;
+    private ArrayList<Merchant> merchants;
     private ArrayList<SplitPayment> splitPayments;
 
     private BankManager() {
         users = new ArrayList<User>();
-        commerciants = new ArrayList<Commerciant>();
+        merchants = new ArrayList<Merchant>();
         splitPayments = new ArrayList<SplitPayment>();
     }
 
@@ -46,7 +46,7 @@ public final class BankManager {
      */
     public void resetBankData() {
         users.clear();
-        commerciants.clear();
+        merchants.clear();
     }
 
     /**
@@ -62,7 +62,7 @@ public final class BankManager {
      * @param comm a list of the commerciants
      */
     public void addCommerciants(final List<CommerciantInput> comm) {
-        comm.forEach(commerciant -> commerciants.add(new Commerciant(commerciant)));
+        comm.forEach(commerciant -> merchants.add(new Merchant(commerciant)));
     }
 
     /**
@@ -199,8 +199,8 @@ public final class BankManager {
      * @param name the name of the commerciant
      * @return the commerciant, or null if not found
      */
-    public Commerciant getCommerciantByName(final String name) {
-        return commerciants.stream()
+    public Merchant getCommerciantByName(final String name) {
+        return merchants.stream()
                            .filter(comm -> comm.getName().equals(name))
                            .findFirst()
                            .orElse(null);
@@ -211,8 +211,8 @@ public final class BankManager {
      * @param iban the IBAN of the commerciant
      * @return the commerciant, or null if not found
      */
-    public Commerciant getCommerciantByIban(final String iban) {
-        return commerciants.stream()
+    public Merchant getCommerciantByIban(final String iban) {
+        return merchants.stream()
                            .filter(comm -> comm.getAccount().equals(iban))
                            .findFirst()
                            .orElse(null);

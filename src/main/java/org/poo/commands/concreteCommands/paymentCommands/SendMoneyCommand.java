@@ -3,7 +3,7 @@ package org.poo.commands.concreteCommands.paymentCommands;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.accounts.Account;
 import org.poo.commands.Command;
-import org.poo.commerciant.Commerciant;
+import org.poo.merchant.Merchant;
 import org.poo.fileio.CommandInput;
 import org.poo.managers.ExchangeManager;
 import org.poo.transaction.Transaction;
@@ -23,7 +23,7 @@ public final class SendMoneyCommand extends Command {
             Account receiverAccount = getBankManager().getAccount(getInput().getReceiver());
             User receiverUser = getBankManager().getUserByAccount(receiverAccount);
 
-            Commerciant comm = getBankManager().getCommerciantByIban(getInput().getReceiver());
+            Merchant comm = getBankManager().getCommerciantByIban(getInput().getReceiver());
             boolean receiverIsComm = comm != null;
 
             if (senderUser == null || (receiverUser == null && !receiverIsComm)) {

@@ -8,7 +8,7 @@ import lombok.Setter;
 
 import org.poo.cards.Card;
 import org.poo.cards.CardFactory;
-import org.poo.commerciant.Commerciant;
+import org.poo.merchant.Merchant;
 import org.poo.fileio.CommandInput;
 import org.poo.managers.BankManager;
 import org.poo.managers.ExchangeManager;
@@ -39,7 +39,7 @@ public abstract class Account implements Visitable {
     private static final int TRANSACTIONS_REQUIRED = 5;
 
     private HashMap<String, Boolean> discounts;
-    private HashMap<Commerciant, Integer> transactionsMade;
+    private HashMap<Merchant, Integer> transactionsMade;
     private double totalSpent;
 
     public Account(final CommandInput input) {
@@ -51,7 +51,7 @@ public abstract class Account implements Visitable {
         this.transactions = new ArrayList<Transaction>();
         this.minBalance = 0;
         this.discounts = new HashMap<String, Boolean>();
-        this.transactionsMade = new HashMap<Commerciant, Integer>();
+        this.transactionsMade = new HashMap<Merchant, Integer>();
         this.totalSpent = 0;
     }
 
@@ -89,11 +89,11 @@ public abstract class Account implements Visitable {
 
     /**
      * Increments the number of transactions made to a specific commerciant
-     * @param commerciant the commerciant to which the transaction was made
+     * @param merchant the commerciant to which the transaction was made
      */
-    public void addTransactionToCommerciant(final Commerciant commerciant) {
-        int current = transactionsMade.getOrDefault(commerciant, 0);
-        transactionsMade.put(commerciant, ++current);
+    public void addTransactionToCommerciant(final Merchant merchant) {
+        int current = transactionsMade.getOrDefault(merchant, 0);
+        transactionsMade.put(merchant, ++current);
     }
 
     /**

@@ -1,16 +1,16 @@
 package org.poo.cashbackStrategies;
 
 import org.poo.accounts.Account;
-import org.poo.commerciant.Commerciant;
+import org.poo.merchant.Merchant;
 
 public interface CashbackStrategy {
     /**
      * Adds cashback to an account
      * @param account the account that will receive the cashback
      * @param amount the amount of money spent in the last transaction
-     * @param commerciant the commerciant to which the transaction was made
+     * @param merchant the commerciant to which the transaction was made
      */
-    void cashback(Account account, double amount, Commerciant commerciant);
+    void cashback(Account account, double amount, Merchant merchant);
 
     int TWO_TRANSACTION_MADE = 2;
     int FIVE_TRANSACTION_MADE = 5;

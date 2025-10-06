@@ -3,7 +3,7 @@ package org.poo.paymentStrategies;
 import org.poo.accounts.Account;
 import org.poo.accounts.business.BusinessAccount;
 import org.poo.accounts.business.BusinessRoles;
-import org.poo.commerciant.Commerciant;
+import org.poo.merchant.Merchant;
 import org.poo.managers.BankManager;
 import org.poo.managers.ExchangeManager;
 import org.poo.cards.Card;
@@ -36,7 +36,7 @@ public final class PayOnlineStrategy implements PaymentStrategy {
             User user = bankManager.getUserByEmail(input.getEmail());
             Card card = bankManager.getCardByNumber(input.getCardNumber());
             Account account = bankManager.getAccountOfCard(card);
-            Commerciant commerciant = bankManager.getCommerciantByName(input.getCommerciant());
+            Merchant merchant = bankManager.getCommerciantByName(input.getCommerciant());
 
             // Get the conversion rate from the exchange manager
             // and calculate the converted price to be paid
@@ -78,7 +78,7 @@ public final class PayOnlineStrategy implements PaymentStrategy {
             if (account.canPay(totalPrice, account.getCurrency())) {
                 account.spendFunds(totalPrice);
 
-                commerciant.getCashbackStrategy().cashback(account, convertedPrice, commerciant);
+                merchant.getCashbackStrategy().cashback(account, convertedPrice, merchant);
 
                 // Add the transaction to the user's list of transactions
                 Transaction transaction = new Transaction.Builder()

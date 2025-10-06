@@ -1,4 +1,4 @@
-package org.poo.commerciant;
+package org.poo.merchant;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,14 +9,14 @@ import org.poo.fileio.CommerciantInput;
 
 @Getter
 @Setter
-public final class Commerciant {
+public final class Merchant {
     private String name;
     private int id;
     private String account;
     private String type;
     private CashbackStrategy cashbackStrategy;
 
-    public Commerciant(final CommerciantInput input) {
+    public Merchant(final CommerciantInput input) {
         name = input.getCommerciant();
         id = input.getId();
         account = input.getAccount();

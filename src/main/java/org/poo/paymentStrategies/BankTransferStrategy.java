@@ -3,7 +3,7 @@ package org.poo.paymentStrategies;
 import org.poo.accounts.Account;
 import org.poo.accounts.business.BusinessAccount;
 import org.poo.accounts.business.BusinessRoles;
-import org.poo.commerciant.Commerciant;
+import org.poo.merchant.Merchant;
 import org.poo.managers.BankManager;
 import org.poo.managers.ExchangeManager;
 import org.poo.fileio.CommandInput;
@@ -30,7 +30,7 @@ public final class BankTransferStrategy implements PaymentStrategy {
             Account sender = bankManager.getAccount(input.getAccount());
             Account receiver = bankManager.getAccount(input.getReceiver());
             User senderUser = sender.ownerOfAccount();
-            Commerciant commerciant = bankManager.getCommerciantByIban(input.getReceiver());
+            Merchant merchant = bankManager.getCommerciantByIban(input.getReceiver());
 
             double totalSenderAmount = senderUser.getPlan().addFee(input.getAmount(),
                                                                    sender.getCurrency());
@@ -54,9 +54,9 @@ public final class BankTransferStrategy implements PaymentStrategy {
             if (sender.canPay(totalSenderAmount, sender.getCurrency())) {
                 sender.spendFunds(totalSenderAmount);
 
-                if (commerciant != null) {
-                    commerciant.getCashbackStrategy().cashback(sender, input.getAmount(),
-                                                               commerciant);
+                if (merchant != null) {
+                    merchant.getCashbackStrategy().cashback(sender, input.getAmount(),
+                            merchant);
                 } else {
                     double receiverAmount = exchangeManager.getAmount(sender.getCurrency(),
                                                                       receiver.getCurrency(),

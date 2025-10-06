@@ -1,18 +1,18 @@
 package org.poo.cashbackStrategies;
 
 import org.poo.accounts.Account;
-import org.poo.commerciant.Commerciant;
+import org.poo.merchant.Merchant;
 
 public final class NrOfTransactions implements CashbackStrategy {
     @Override
     public void cashback(final Account account, final double amount,
-                         final Commerciant commerciant) {
-        boolean isDiscountUsed = account.getDiscounts().getOrDefault(commerciant.getType(), true);
+                         final Merchant merchant) {
+        boolean isDiscountUsed = account.getDiscounts().getOrDefault(merchant.getType(), true);
             double totalCashback = 0;
 
         if (!isDiscountUsed) {
 
-            switch (commerciant.getType()) {
+            switch (merchant.getType()) {
                 case "Food":
                     totalCashback = amount * TWO_PERCENT;
                     break;
@@ -28,14 +28,14 @@ public final class NrOfTransactions implements CashbackStrategy {
 
             // Get the cashback and mark the discount as used
             account.addFunds(totalCashback);
-            account.getDiscounts().put(commerciant.getType(), true);
+            account.getDiscounts().put(merchant.getType(), true);
         }
 
         // Increment the number of transactions made
-        account.addTransactionToCommerciant(commerciant);
+        account.addTransactionToCommerciant(merchant);
 
         // Check if the account should get a cashback
-        switch (account.getTransactionsMade().get(commerciant)) {
+        switch (account.getTransactionsMade().get(merchant)) {
             case TWO_TRANSACTION_MADE:
                 account.getDiscounts().putIfAbsent("Food", false);
                 break;

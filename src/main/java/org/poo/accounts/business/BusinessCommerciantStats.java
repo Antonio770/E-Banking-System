@@ -2,7 +2,7 @@ package org.poo.accounts.business;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.poo.commerciant.Commerciant;
+import org.poo.merchant.Merchant;
 import org.poo.user.User;
 
 import java.util.ArrayList;
@@ -10,12 +10,12 @@ import java.util.ArrayList;
 @Getter
 @Setter
 public final class BusinessCommerciantStats {
-    private Commerciant commerciant;
+    private Merchant merchant;
     private double totalReceived;
     private ArrayList<User> users;
 
-    public BusinessCommerciantStats(final Commerciant commerciant) {
-        this.commerciant = commerciant;
+    public BusinessCommerciantStats(final Merchant merchant) {
+        this.merchant = merchant;
         totalReceived = 0;
         users = new ArrayList<>();
     }

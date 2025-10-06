@@ -1,7 +1,7 @@
 package org.poo.cashbackStrategies;
 
 import org.poo.accounts.Account;
-import org.poo.commerciant.Commerciant;
+import org.poo.merchant.Merchant;
 import org.poo.managers.ExchangeManager;
 import org.poo.user.User;
 
@@ -28,7 +28,7 @@ public final class SpendingThreshold implements CashbackStrategy {
 
     @Override
     public void cashback(final Account account, final double amount,
-                         final Commerciant commerciant) {
+                         final Merchant merchant) {
         User user = account.ownerOfAccount();
 
         ExchangeManager exchangeManager = ExchangeManager.getInstance();
@@ -45,10 +45,10 @@ public final class SpendingThreshold implements CashbackStrategy {
             totalCashback = getTotalCashback(amount, user, firstThresholdCashback);
         }
 
-        boolean isDiscountUsed = account.getDiscounts().getOrDefault(commerciant.getType(), true);
+        boolean isDiscountUsed = account.getDiscounts().getOrDefault(merchant.getType(), true);
 
         if (!isDiscountUsed) {
-            switch (commerciant.getType()) {
+            switch (merchant.getType()) {
                 case "Food":
                     totalCashback += amount * TWO_PERCENT;
                     break;
@@ -63,7 +63,7 @@ public final class SpendingThreshold implements CashbackStrategy {
             }
 
             // Mark the discount as used
-            account.getDiscounts().put(commerciant.getType(), true);
+            account.getDiscounts().put(merchant.getType(), true);
         }
 
         account.addFunds(totalCashback);
